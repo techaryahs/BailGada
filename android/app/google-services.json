@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "637301464116",
+    "firebase_url": "https://bailgada-race-default-rtdb.firebaseio.com",
+    "project_id": "bailgada-race",
+    "storage_bucket": "bailgada-race.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:637301464116:android:45a9295967520be0a9be61",
+        "android_client_info": {
+          "package_name": "com.amit.bailgada"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCtUtYH4w9xTcvEEKahSnAj01tiyGIm4yY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
