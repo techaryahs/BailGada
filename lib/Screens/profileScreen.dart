@@ -3,6 +3,8 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../host/Screens/dashboard_page.dart';
+
 class ProfileScreen extends StatefulWidget {
   final String userKey;
 
@@ -27,7 +29,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _fetchUserData();
   }
 
+
   void _fetchUserData() async {
+
     final dbRef =
     FirebaseDatabase.instance.ref("bailGada/users/${widget.userKey}");
     final snapshot = await dbRef.get();
@@ -189,8 +193,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
             _buildProfileOption(
               icon: FontAwesomeIcons.cow,
               title: "Bail (OX)",
+              onTap: () {},
+            ),
+            _buildProfileOption(
+              icon: FontAwesomeIcons.crown,
+              title: "Host",
               onTap: () {
-                Navigator.push(context, "/signin" as Route<Object?>);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => DashboardPage()),
+                );
               },
             ),
             _buildProfileOption(

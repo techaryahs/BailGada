@@ -1,17 +1,5 @@
 import 'package:flutter/material.dart';
 
-/// 🎯 BottomNavBar Widget
-/// Persistent bottom navigation bar with four items:
-/// Home | Driver | Host | Profile
-///
-/// Example usage:
-/// ```dart
-/// BottomNavBar(
-///   selectedIndex: _selectedIndex,
-///   onTap: (index) => setState(() => _selectedIndex = index),
-/// )
-/// ```
-
 class BottomNavBar extends StatelessWidget {
   final int selectedIndex;
   final Function(int) onTap;
@@ -47,16 +35,6 @@ class BottomNavBar extends StatelessWidget {
             icon: Icon(Icons.home_outlined),
             activeIcon: Icon(Icons.home),
             label: "Home",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.drive_eta_outlined),
-            activeIcon: Icon(Icons.drive_eta),
-            label: "Driver",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.groups_outlined),
-            activeIcon: Icon(Icons.groups),
-            label: "Host",
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person_outline),

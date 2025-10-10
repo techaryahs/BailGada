@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../Screens/homeScreen.dart';
+import '../auth/signin.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -20,30 +20,39 @@ class _SplashScreenState extends State<SplashScreen>
   void initState() {
     super.initState();
 
-    // Animation setup
-    _controller =
-        AnimationController(vsync: this, duration: const Duration(seconds: 2));
-    _fadeAnimation = CurvedAnimation(parent: _controller, curve: Curves.easeIn);
+    // 🎞️ Animation setup
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    );
+    _fadeAnimation =
+        CurvedAnimation(parent: _controller, curve: Curves.easeIn);
     _controller.forward();
 
-    // Navigate after 3 seconds
-    Timer(const Duration(seconds: 3), () async {
-      final prefs = await SharedPreferences.getInstance();
-      bool isLoggedIn = prefs.getBool("isLoggedIn") ?? false;
-      String userKey = prefs.getString("userKey") ?? "";
+    // ⏳ Navigate after 3 seconds
+    Timer(const Duration(seconds: 3), _checkLoginStatus);
+  }
 
-      if (!mounted) return; // prevents navigating if widget disposed
+  Future<void> _checkLoginStatus() async {
+    final prefs = await SharedPreferences.getInstance();
+    bool isLoggedIn = prefs.getBool("isLoggedIn") ?? false;
+    String userKey = prefs.getString("userKey") ?? "";
 
-      if (isLoggedIn && userKey.isNotEmpty) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => HomeScreen(userKey: userKey)),
-        );
-      } else {
-        Navigator.pushReplacementNamed(context, "/signin");
+    print("🔍 Splash Debug: isLoggedIn=$isLoggedIn, userKey=$userKey");
+
+    if (!mounted) return;
+
+    if (isLoggedIn && userKey.isNotEmpty) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => HomeScreen(userKey: userKey)),
+      );
+    } else {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const SignIn()),
+      );
     }
-    });
-
   }
 
   @override
@@ -73,12 +82,10 @@ class _SplashScreenState extends State<SplashScreen>
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // 🐂 Logo
               const Icon(Icons.sports_motorsports,
                   size: 100, color: Colors.orangeAccent),
               const SizedBox(height: 20),
 
-              // App Title
               const Text(
                 "BailGada Race",
                 style: TextStyle(
@@ -90,7 +97,6 @@ class _SplashScreenState extends State<SplashScreen>
               ),
               const SizedBox(height: 10),
 
-              // Tagline
               const Text(
                 "Ride the Speed, Rule the Track",
                 style: TextStyle(
@@ -101,7 +107,6 @@ class _SplashScreenState extends State<SplashScreen>
               ),
               const SizedBox(height: 40),
 
-              // Progress Indicator
               const CircularProgressIndicator(
                 valueColor: AlwaysStoppedAnimation<Color>(Colors.orangeAccent),
               ),

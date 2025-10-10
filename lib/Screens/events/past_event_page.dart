@@ -1,32 +1,237 @@
+import 'dart:io';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 
-class PastEventsPage extends StatelessWidget {
+class PastEventsPage extends StatefulWidget {
   const PastEventsPage({super.key});
 
   @override
+  State<PastEventsPage> createState() => _PastEventsPageState();
+}
+
+class _PastEventsPageState extends State<PastEventsPage> {
+  final DatabaseReference _eventsRef =
+  FirebaseDatabase.instance.ref().child('events');
+
+  @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16),
+    return StreamBuilder(
+      stream: _eventsRef.onValue,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(
+            child: CircularProgressIndicator(color: Colors.orangeAccent),
+          );
+        }
+
+        if (snapshot.hasError) {
+          return const Center(
+            child: Text(
+              "⚠️ Error loading past events",
+              style: TextStyle(color: Colors.redAccent),
+            ),
+          );
+        }
+
+        if (!snapshot.hasData || snapshot.data?.snapshot.value == null) {
+          return const Center(
+            child: Text(
+              "No past events available.",
+              style: TextStyle(color: Colors.white70, fontSize: 16),
+            ),
+          );
+        }
+
+        // Convert Firebase data into list
+        final data = Map<dynamic, dynamic>.from(
+            (snapshot.data! as DatabaseEvent).snapshot.value as Map);
+        final allEvents = data.entries.map((e) {
+          return Map<String, dynamic>.from(e.value);
+        }).toList();
+
+        // ✅ Filter: events that already ended (past)
+        final now = DateTime.now();
+        final today = DateTime(now.year, now.month, now.day);
+        final pastEvents = allEvents.where((event) {
+          if (event['eventDate'] == null) return false;
+          try {
+            final date = DateTime.parse(event['eventDate']);
+            final eventDay = DateTime(date.year, date.month, date.day);
+            return eventDay.isBefore(today);
+          } catch (_) {
+            return false;
+          }
+        }).toList();
+
+        if (pastEvents.isEmpty) {
+          return const Center(
+            child: Text(
+              "⏳ No past events found.",
+              style: TextStyle(color: Colors.white70),
+            ),
+          );
+        }
+
+        return SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                "⏳ Past Events",
+                style: TextStyle(
+                  color: Colors.orangeAccent,
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  shadows: [Shadow(color: Colors.orange, blurRadius: 2)],
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // 🧾 Past Event Cards
+              ...pastEvents.map((event) => _buildPastEventCard(event)),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildPastEventCard(Map<String, dynamic> event) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 20),
+      decoration: BoxDecoration(
+        color: Colors.black.withOpacity(0.8),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.orange.withOpacity(0.3)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.orange.withOpacity(0.2),
+            blurRadius: 10,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            "⏳ Past Events",
-            style: TextStyle(
-              color: Colors.grey,
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
+          // 🎯 Poster Image
+          ClipRRect(
+            borderRadius:
+            const BorderRadius.vertical(top: Radius.circular(16)),
+            child: Stack(
+              children: [
+                event["eventBannerPath"] != null
+                    ? Image.file(
+                  File(event["eventBannerPath"]),
+                  width: double.infinity,
+                  height: 180,
+                  fit: BoxFit.cover,
+                )
+                    : Image.asset(
+                  "assets/images/bailgada_poster.png",
+                  width: double.infinity,
+                  height: 180,
+                  fit: BoxFit.cover,
+                ),
+                Container(
+                  height: 180,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Colors.black.withOpacity(0.7),
+                        Colors.transparent,
+                        Colors.black.withOpacity(0.7),
+                      ],
+                      begin: Alignment.bottomCenter,
+                      end: Alignment.topCenter,
+                    ),
+                  ),
+                ),
+                Positioned(
+                  bottom: 12,
+                  left: 16,
+                  child: Text(
+                    event["eventName"] ?? "Untitled Event",
+                    style: const TextStyle(
+                      color: Colors.orangeAccent,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      shadows: [Shadow(color: Colors.black, blurRadius: 6)],
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
-          const SizedBox(height: 16),
-          Image.asset(
-            "assets/images/bailgada_poster.png",
-            fit: BoxFit.cover,
-          ),
-          const SizedBox(height: 16),
-          const Text(
-            "Relive the glory of past Bullock Cart Races! Catch highlights and unforgettable moments that made history.",
-            style: TextStyle(color: Colors.white70, height: 1.5),
+
+          // 🏆 Event Info
+          Padding(
+            padding: const EdgeInsets.all(14),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (event["eventIntro"] != null)
+                  Text(
+                    event["eventIntro"],
+                    style: const TextStyle(
+                      color: Colors.white70,
+                      height: 1.5,
+                    ),
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    const Icon(Icons.calendar_today,
+                        size: 14, color: Colors.orangeAccent),
+                    const SizedBox(width: 6),
+                    Text(
+                      event["eventDate"]?.substring(0, 10) ??
+                          "Unknown Date",
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        fontSize: 13,
+                      ),
+                    ),
+                    const SizedBox(width: 14),
+                    const Icon(Icons.location_on,
+                        size: 14, color: Colors.orangeAccent),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Text(
+                        event["eventLocation"] ?? "Unknown Location",
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 13,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Container(
+                  padding:
+                  const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Colors.grey, Colors.blueGrey],
+                    ),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Text(
+                    "ENDED",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),

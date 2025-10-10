@@ -1,60 +1,101 @@
+import 'dart:io';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-
 import '../EventDetailsScreen.dart';
 
-class CurrentEventsPage extends StatelessWidget {
+class CurrentEventsPage extends StatefulWidget {
   const CurrentEventsPage({super.key});
 
   @override
+  State<CurrentEventsPage> createState() => _CurrentEventsPageState();
+}
+
+class _CurrentEventsPageState extends State<CurrentEventsPage> {
+  final DatabaseReference _eventsRef =
+  FirebaseDatabase.instance.ref().child('events');
+
+  @override
   Widget build(BuildContext context) {
-    // Example events
-    final List<Map<String, String>> currentEvents = [
-      {
-        "image": "assets/images/bailgada_poster.png",
-        "title": "Maharashtra Championship 2025",
-        "hostName": "Shivaji Patil",
-        "hostImage": "assets/images/default_profile.jpg",
-        "location": "Kolhapur, Maharashtra",
-        "description":
-        "Experience the thrill of ongoing Bullock Cart Races happening across Maharashtra! Witness the strength, speed, and tradition come alive on the tracks.",
-      },
-      {
-        "image": "assets/images/bailgada_poster.png",
-        "title": "BullPower Open Race",
-        "hostName": "Rajesh Jadhav",
-        "hostImage": "assets/images/default_profile.jpg",
-        "location": "Sangli, Maharashtra",
-        "description":
-        "Get ready for the BullPower Open Race — where farmers and racers unite to showcase endurance and excellence in this year’s fastest track battle!",
-      },
-    ];
+    return StreamBuilder(
+      stream: _eventsRef.onValue,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(
+              child: CircularProgressIndicator(color: Colors.orangeAccent));
+        }
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            "🔥 Current Events",
-            style: TextStyle(
-              color: Colors.orange,
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-              shadows: [
-                Shadow(color: Colors.orangeAccent, blurRadius: 1),
-              ],
+        if (snapshot.hasError) {
+          return const Center(
+            child: Text("Error loading events",
+                style: TextStyle(color: Colors.redAccent)),
+          );
+        }
+
+        if (!snapshot.hasData || snapshot.data?.snapshot.value == null) {
+          return const Center(
+            child: Text(
+              "No current events available.",
+              style: TextStyle(color: Colors.white70, fontSize: 16),
             ),
-          ),
-          const SizedBox(height: 20),
+          );
+        }
 
-          // 🔥 Event Cards
-          ...currentEvents.map((event) => _buildEventCard(context, event)),
-        ],
-      ),
+        final data = Map<dynamic, dynamic>.from(
+            (snapshot.data! as DatabaseEvent).snapshot.value as Map);
+        final allEvents = data.entries.map((e) {
+          return Map<String, dynamic>.from(e.value);
+        }).toList();
+
+        // ✅ Filter: upcoming or ongoing events (today or later)
+        final now = DateTime.now();
+        final today = DateTime(now.year, now.month, now.day);
+
+        final currentEvents = allEvents.where((event) {
+          if (event['eventDate'] == null) return false;
+          try {
+            final date = DateTime.parse(event['eventDate']);
+            final eventDay = DateTime(date.year, date.month, date.day);
+            return eventDay.isAtSameMomentAs(today);
+          } catch (_) {
+            return false;
+          }
+        }).toList();
+
+        if (currentEvents.isEmpty) {
+          return const Center(
+            child: Text(
+              "No ongoing or upcoming events found.",
+              style: TextStyle(color: Colors.white70, fontSize: 16),
+            ),
+          );
+        }
+
+        return SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                "🔥 Current Events",
+                style: TextStyle(
+                  color: Colors.orange,
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  shadows: [
+                    Shadow(color: Colors.orangeAccent, blurRadius: 1),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+              ...currentEvents.map((event) => _buildEventCard(context, event)),
+            ],
+          ),
+        );
+      },
     );
   }
 
-  Widget _buildEventCard(BuildContext context, Map<String, String> event) {
+  Widget _buildEventCard(BuildContext context, Map<String, dynamic> event) {
     return InkWell(
       onTap: () {
         Navigator.push(
@@ -83,11 +124,19 @@ class CurrentEventsPage extends StatelessWidget {
           children: [
             // 🎯 Event Poster
             ClipRRect(
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+              borderRadius:
+              const BorderRadius.vertical(top: Radius.circular(16)),
               child: Stack(
                 children: [
-                  Image.asset(
-                    event["image"]!,
+                  event["eventBannerPath"] != null
+                      ? Image.file(
+                    File(event["eventBannerPath"]),
+                    width: double.infinity,
+                    height: 180,
+                    fit: BoxFit.cover,
+                  )
+                      : Image.asset(
+                    "assets/images/bailgada_poster.png",
                     width: double.infinity,
                     height: 180,
                     fit: BoxFit.cover,
@@ -111,7 +160,7 @@ class CurrentEventsPage extends StatelessWidget {
                     left: 16,
                     right: 16,
                     child: Text(
-                      event["title"]!,
+                      event["eventName"] ?? "Untitled Event",
                       style: const TextStyle(
                         color: Colors.orangeAccent,
                         fontSize: 18,
@@ -131,10 +180,10 @@ class CurrentEventsPage extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
               child: Row(
                 children: [
-                  CircleAvatar(
+                  const CircleAvatar(
                     radius: 20,
-                    backgroundImage: AssetImage(event["hostImage"]!),
-                    backgroundColor: Colors.grey.shade800,
+                    backgroundImage:
+                    AssetImage("assets/images/default_profile.jpg"),
                   ),
                   const SizedBox(width: 10),
                   Expanded(
@@ -142,7 +191,7 @@ class CurrentEventsPage extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          event["hostName"]!,
+                          event["eventName"] ?? "Unknown Host",
                           style: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
@@ -155,7 +204,7 @@ class CurrentEventsPage extends StatelessWidget {
                             const SizedBox(width: 4),
                             Flexible(
                               child: Text(
-                                event["location"]!,
+                                event["eventLocation"] ?? "Unknown Location",
                                 style: const TextStyle(
                                     color: Colors.white70, fontSize: 12),
                                 overflow: TextOverflow.ellipsis,
@@ -167,8 +216,8 @@ class CurrentEventsPage extends StatelessWidget {
                     ),
                   ),
                   Container(
-                    padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
                       gradient: const LinearGradient(
                         colors: [Colors.redAccent, Colors.red],
@@ -188,15 +237,17 @@ class CurrentEventsPage extends StatelessWidget {
             ),
 
             // 📖 Short Description
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-              child: Text(
-                event["description"]!,
-                style: const TextStyle(color: Colors.white70, height: 1.5),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
+            if (event["eventIntro"] != null)
+              Padding(
+                padding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                child: Text(
+                  event["eventIntro"],
+                  style: const TextStyle(color: Colors.white70, height: 1.5),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
-            ),
 
             const SizedBox(height: 10),
           ],

@@ -185,7 +185,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
             const SizedBox(height: 20),
 
-// 🏆 Top Racers Section
+            // 🏆 Top Racers Section
             // 🏁🔥 Top Racers (Interactive Leaderboard Preview)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
@@ -299,16 +299,11 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // 🎟️ Event Card Widget
-
-
-
+  // 🎟️ Event Bottom Bar Card Widget
   @override
   Widget build(BuildContext context) {
     final List<Widget> pages = [
       _buildHomeContent(),
-      DriverScreen(),
-      HostScreen(),
       ProfileScreen(userKey: widget.userKey),
 
     ];
