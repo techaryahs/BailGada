@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../Screens/EventDetailsScreen.dart';
 import 'admin_event_details_page.dart';
 
 class AdminEventsPage extends StatelessWidget {

@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'dart:convert';
+import 'dart:ui';
 import 'package:crypto/crypto.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../Screens/homeScreen.dart';
-import '../utils/translation_helper.dart';
 import 'signup.dart';
 
 // Fresh Vibrant Orange and White theme colors
@@ -76,14 +77,14 @@ class _SignInState extends State<SignIn> {
         });
 
         if (!userFound && mounted) {
-          _showMessage('invalid_credentials'.tr);
+          _showMessage("Invalid email or password");
         }
       } else {
-        _showMessage('error'.tr);
+        _showMessage("No users found in database");
       }
 
     } catch (e) {
-      _showMessage("${'error'.tr}: $e");
+      _showMessage("Error: $e");
     } finally {
       if (mounted) {
         setState(() => isLoading = false);
@@ -110,9 +111,8 @@ class _SignInState extends State<SignIn> {
 
   @override
   Widget build(BuildContext context) {
-    return TranslationBuilder(
-      builder: (context) => Scaffold(
-        body: Container(
+    return Scaffold(
+      body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
@@ -174,7 +174,7 @@ class _SignInState extends State<SignIn> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'sign_in'.tr,
+                    "Sign in to continue",
                     style: TextStyle(
                       fontSize: 16,
                       color: AppColors.secondary.withOpacity(0.7),
@@ -202,12 +202,12 @@ class _SignInState extends State<SignIn> {
                         children: [
                           _buildTextField(
                             controller: _emailController,
-                            label: 'email'.tr,
+                            label: "Email Address",
                             icon: Icons.email_rounded,
                             keyboardType: TextInputType.emailAddress,
                             validator: (value) {
                               if (value == null || value.trim().isEmpty) {
-                                return 'field_required'.tr;
+                                return 'Please enter your email';
                               }
                               return null;
                             },
@@ -215,15 +215,15 @@ class _SignInState extends State<SignIn> {
                           const SizedBox(height: 20),
                           _buildTextField(
                             controller: _passwordController,
-                            label: 'password'.tr,
+                            label: "Password",
                             icon: Icons.lock_rounded,
                             obscure: true,
                             validator: (value) {
                               if (value == null || value.trim().isEmpty) {
-                                return 'field_required'.tr;
+                                return 'Please enter your password';
                               }
                               if (value.length < 6) {
-                                return 'password_too_short'.tr;
+                                return 'Password must be at least 6 characters';
                               }
                               return null;
                             },
@@ -241,7 +241,7 @@ class _SignInState extends State<SignIn> {
                                 ),
                               ),
                               Text(
-                                'remember_me'.tr,
+                                'Remember Me',
                                 style: TextStyle(
                                   color: AppColors.secondary,
                                   fontWeight: FontWeight.w500,
@@ -285,9 +285,9 @@ class _SignInState extends State<SignIn> {
                                   strokeWidth: 3,
                                 ),
                               )
-                                  : Text(
-                                'sign_in'.tr,
-                                style: const TextStyle(
+                                  : const Text(
+                                "Sign In",
+                                style: TextStyle(
                                   fontSize: 18,
                                   color: Colors.white,
                                   fontWeight: FontWeight.bold,
@@ -306,7 +306,7 @@ class _SignInState extends State<SignIn> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        '${'dont_have_account'.tr} ',
+                        "Don't have an account? ",
                         style: TextStyle(
                           color: AppColors.secondary.withOpacity(0.7),
                           fontSize: 15,
@@ -324,9 +324,9 @@ class _SignInState extends State<SignIn> {
                           shaderCallback: (bounds) => LinearGradient(
                             colors: [AppColors.primary, AppColors.darkOrange],
                           ).createShader(bounds),
-                          child: Text(
-                            'sign_up'.tr,
-                            style: const TextStyle(
+                          child: const Text(
+                            "Sign Up",
+                            style: TextStyle(
                               color: Colors.white,
                               fontSize: 15,
                               fontWeight: FontWeight.bold,
@@ -342,7 +342,6 @@ class _SignInState extends State<SignIn> {
             ),
           ),
         ),
-      ),
       ),
     );
   }

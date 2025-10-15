@@ -1,8 +1,8 @@
 import 'dart:io';
+import 'package:bailgada/host/Screens/event_host_page.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import '../../Screens/EventDetailsScreen.dart';
-import '../../utils/translation_helper.dart';
 
 class HostCurrentEventsPage extends StatefulWidget {
   const HostCurrentEventsPage({super.key});
@@ -43,7 +43,7 @@ class _HostCurrentEventsPageState extends State<HostCurrentEventsPage> {
         }
 
         final data = Map<dynamic, dynamic>.from(
-            snapshot.data!.snapshot.value as Map);
+            (snapshot.data! as DatabaseEvent).snapshot.value as Map);
         final allEvents = data.entries.map((e) {
           return Map<String, dynamic>.from(e.value);
         }).toList();
@@ -63,12 +63,10 @@ class _HostCurrentEventsPageState extends State<HostCurrentEventsPage> {
         }).toList();
 
         if (currentEvents.isEmpty) {
-          return TranslationBuilder(
-            builder: (context) => Center(
-              child: Text(
-                'no_ongoing_upcoming_events'.tr,
-                style: const TextStyle(color: Colors.white70, fontSize: 16),
-              ),
+          return const Center(
+            child: Text(
+              "No ongoing or upcoming events found.",
+              style: TextStyle(color: Colors.white70, fontSize: 16),
             ),
           );
         }
@@ -104,7 +102,7 @@ class _HostCurrentEventsPageState extends State<HostCurrentEventsPage> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => EventDetailsScreen(event: event),
+            builder: (context) => EventHostPage(),
           ),
         );
       },

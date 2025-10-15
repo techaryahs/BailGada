@@ -42,7 +42,7 @@ class _HostPastEventsPageState extends State<HostPastEventsPage> {
         }
 
         final data = Map<dynamic, dynamic>.from(
-            snapshot.data!.snapshot.value as Map);
+            (snapshot.data! as DatabaseEvent).snapshot.value as Map);
         final allEvents = data.entries.map((e) {
           return Map<String, dynamic>.from(e.value);
         }).toList();

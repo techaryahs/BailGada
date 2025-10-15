@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../utils/translation_helper.dart';
 import '../host/Screens/dashboard_page.dart';
+import 'my_bail_ox_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   final String userKey;
@@ -96,23 +96,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return TranslationBuilder(
-      builder: (context) => Scaffold(
-        backgroundColor: Colors.black,
-        appBar: AppBar(
-          elevation: 0,
-          title: Text(
-            'profile'.tr,
-            style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-          ),
-          backgroundColor: Colors.orange,
-          centerTitle: true,
+    return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        elevation: 0,
+        title: const Text(
+          "Profile",
+          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
         ),
-        body: name == null
-            ? const Center(
-          child: CircularProgressIndicator(color: Colors.orange),
-        )
-            : SingleChildScrollView(
+        backgroundColor: Colors.orange,
+        centerTitle: true,
+      ),
+      body: name == null
+          ? const Center(
+        child: CircularProgressIndicator(color: Colors.orange),
+      )
+          : SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
         child: Column(
           children: [
@@ -166,9 +165,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     onPressed: () {
                       // TODO: Navigate to Edit Profile
                     },
-                    child: Text(
-                      'edit_profile'.tr,
-                      style: const TextStyle(
+                    child: const Text(
+                      "Edit Profile",
+                      style: TextStyle(
                           fontSize: 16,
                           color: Colors.black,
                           fontWeight: FontWeight.bold),
@@ -183,22 +182,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
             // ⚙️ Profile Options
             _buildProfileOption(
               icon: Icons.lock,
-              title: 'change_password'.tr,
+              title: "Change Password",
               onTap: () {},
             ),
             _buildProfileOption(
               icon: Icons.notifications,
-              title: 'notifications'.tr,
+              title: "Notifications",
               onTap: () {},
             ),
             _buildProfileOption(
               icon: FontAwesomeIcons.cow,
-              title: 'driver'.tr,
-              onTap: () {},
+              title: "Bail (OX)",
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const MyBailOxPage()),
+                );
+              },
             ),
             _buildProfileOption(
               icon: FontAwesomeIcons.crown,
-              title: 'host'.tr,
+              title: "Host",
               onTap: () {
                 Navigator.push(
                   context,
@@ -209,25 +213,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             _buildProfileOption(
               icon: Icons.privacy_tip,
-              title: 'privacy'.tr,
+              title: "Privacy Policy",
               onTap: () {},
             ),
             _buildProfileOption(
               icon: Icons.help,
-              title: 'help'.tr,
+              title: "Help & Support",
               onTap: () {},
             ),
             _buildProfileOption(
               icon: Icons.info,
-              title: 'about'.tr,
+              title: "About App",
               onTap: () {},
-            ),
-            _buildProfileOption(
-              icon: Icons.settings,
-              title: 'settings'.tr,
-              onTap: () {
-                Navigator.pushNamed(context, '/settings');
-              },
             ),
 
             const SizedBox(height: 30),
@@ -246,9 +243,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 onPressed: _showLogoutDialog, // ✅ Show popup
                 icon: const Icon(Icons.logout, color: Colors.white),
-                label: Text(
-                  'logout'.tr,
-                  style: const TextStyle(
+                label: const Text(
+                  "Logout",
+                  style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                       color: Colors.white),
@@ -259,7 +256,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
             const SizedBox(height: 30),
           ],
         ),
-      ),
       ),
     );
   }

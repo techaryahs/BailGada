@@ -1,7 +1,6 @@
 import 'package:bailgada/host/Screens/event_creation_page.dart';
 import 'package:flutter/material.dart';
 import '../../widgets/host_event_category_bar.dart';
-import '../../utils/translation_helper.dart';
 import 'host_current_events.dart';
 import 'host_past_events.dart';
 
@@ -23,26 +22,25 @@ class _HostScreenState extends State<HostScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return TranslationBuilder(
-      builder: (context) => Scaffold(
-        backgroundColor: Colors.black,
-        body: Column(
-          children: [
-            HostTopNavigationBar(
-              currentIndex: selectedIndex,
-              onTabSelected: _onTabSelected,
-            ),
-            Expanded(
-              child: selectedIndex == 0
-                  ? const HostCurrentEventsPage()
-                  : const HostPastEventsPage(),
-            ),
-          ],
-        ),
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: Column(
+        children: [
+          HostTopNavigationBar(
+            currentIndex: selectedIndex,
+            onTabSelected: _onTabSelected,
+          ),
+          Expanded(
+            child: selectedIndex == 0
+                ? const HostCurrentEventsPage()
+                : const HostPastEventsPage(),
+          ),
+        ],
+      ),
 
-        // 🎯 Floating Add Event Button
-        // 🎯 Floating Add Event Button (Enhanced with Label)
-        floatingActionButton: GestureDetector(
+      // 🎯 Floating Add Event Button
+      // 🎯 Floating Add Event Button (Enhanced with Label)
+      floatingActionButton: GestureDetector(
         onTap: () => {
           Navigator.push(
             context,
@@ -70,12 +68,12 @@ class _HostScreenState extends State<HostScreen> {
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
-            children: [
-              const Icon(Icons.add_circle_outline, color: Colors.white, size: 24),
-              const SizedBox(width: 8),
+            children: const [
+              Icon(Icons.add_circle_outline, color: Colors.white, size: 24),
+              SizedBox(width: 8),
               Text(
-                'create_event'.tr,
-                style: const TextStyle(
+                "Add Event",
+                style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 0.5,
@@ -87,7 +85,6 @@ class _HostScreenState extends State<HostScreen> {
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      ),
     );
   }
 }

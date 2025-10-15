@@ -1,7 +1,8 @@
 import 'dart:io';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import '../../utils/translation_helper.dart';
+
+import '../EventDetailsScreen.dart';
 
 class PastEventsPage extends StatefulWidget {
   const PastEventsPage({super.key});
@@ -26,30 +27,26 @@ class _PastEventsPageState extends State<PastEventsPage> {
         }
 
         if (snapshot.hasError) {
-          return TranslationBuilder(
-            builder: (context) => Center(
-              child: Text(
-                'error_loading_past_events'.tr,
-                style: const TextStyle(color: Colors.redAccent),
-              ),
+          return const Center(
+            child: Text(
+              "⚠️ Error loading past events",
+              style: TextStyle(color: Colors.redAccent),
             ),
           );
         }
 
         if (!snapshot.hasData || snapshot.data?.snapshot.value == null) {
-          return TranslationBuilder(
-            builder: (context) => Center(
-              child: Text(
-                'no_past_events_available'.tr,
-                style: const TextStyle(color: Colors.white70, fontSize: 16),
-              ),
+          return const Center(
+            child: Text(
+              "No past events available.",
+              style: TextStyle(color: Colors.white70, fontSize: 16),
             ),
           );
         }
 
         // Convert Firebase data into list
         final data = Map<dynamic, dynamic>.from(
-            snapshot.data!.snapshot.value as Map);
+            (snapshot.data! as DatabaseEvent).snapshot.value as Map);
         final allEvents = data.entries.map((e) {
           return Map<String, dynamic>.from(e.value);
         }).toList();
@@ -69,37 +66,33 @@ class _PastEventsPageState extends State<PastEventsPage> {
         }).toList();
 
         if (pastEvents.isEmpty) {
-          return TranslationBuilder(
-            builder: (context) => Center(
-              child: Text(
-                "⏳ ${'no_past_events'.tr}",
-                style: const TextStyle(color: Colors.white70),
-              ),
+          return const Center(
+            child: Text(
+              "⏳ No past events found.",
+              style: TextStyle(color: Colors.white70),
             ),
           );
         }
 
-        return TranslationBuilder(
-          builder: (context) => SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "⏳ ${'past_events'.tr}",
-                  style: const TextStyle(
-                    color: Colors.orangeAccent,
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    shadows: [Shadow(color: Colors.orange, blurRadius: 2)],
-                  ),
+        return SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                "⏳ Past Events",
+                style: TextStyle(
+                  color: Colors.orangeAccent,
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  shadows: [Shadow(color: Colors.orange, blurRadius: 2)],
                 ),
-                const SizedBox(height: 16),
+              ),
+              const SizedBox(height: 16),
 
-                // 🧾 Past Event Cards
-                ...pastEvents.map((event) => _buildPastEventCard(event)),
-              ],
-            ),
+              // 🧾 Past Event Cards
+              ...pastEvents.map((event) => _buildPastEventCard(event)),
+            ],
           ),
         );
       },
@@ -107,62 +100,70 @@ class _PastEventsPageState extends State<PastEventsPage> {
   }
 
   Widget _buildPastEventCard(Map<String, dynamic> event) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 20),
-      decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.8),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.orange.withOpacity(0.3)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.orange.withOpacity(0.2),
-            blurRadius: 10,
-            offset: const Offset(0, 5),
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => EventDetailsScreen(event: event),
           ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // 🎯 Poster Image
-          ClipRRect(
-            borderRadius:
-            const BorderRadius.vertical(top: Radius.circular(16)),
-            child: Stack(
-              children: [
-                event["eventBannerPath"] != null
-                    ? Image.file(
-                  File(event["eventBannerPath"]),
-                  width: double.infinity,
-                  height: 180,
-                  fit: BoxFit.cover,
-                )
-                    : Image.asset(
-                  "assets/images/bailgada_poster.png",
-                  width: double.infinity,
-                  height: 180,
-                  fit: BoxFit.cover,
-                ),
-                Container(
-                  height: 180,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        Colors.black.withOpacity(0.7),
-                        Colors.transparent,
-                        Colors.black.withOpacity(0.7),
-                      ],
-                      begin: Alignment.bottomCenter,
-                      end: Alignment.topCenter,
+        );
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 20),
+        decoration: BoxDecoration(
+          color: Colors.black.withOpacity(0.8),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: Colors.orange.withOpacity(0.3)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.orange.withOpacity(0.2),
+              blurRadius: 10,
+              offset: const Offset(0, 5),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // 🎯 Poster Image
+            ClipRRect(
+              borderRadius:
+              const BorderRadius.vertical(top: Radius.circular(16)),
+              child: Stack(
+                children: [
+                  event["eventBannerPath"] != null
+                      ? Image.file(
+                    File(event["eventBannerPath"]),
+                    width: double.infinity,
+                    height: 180,
+                    fit: BoxFit.cover,
+                  )
+                      : Image.asset(
+                    "assets/images/bailgada_poster.png",
+                    width: double.infinity,
+                    height: 180,
+                    fit: BoxFit.cover,
+                  ),
+                  Container(
+                    height: 180,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          Colors.black.withOpacity(0.7),
+                          Colors.transparent,
+                          Colors.black.withOpacity(0.7),
+                        ],
+                        begin: Alignment.bottomCenter,
+                        end: Alignment.topCenter,
+                      ),
                     ),
                   ),
-                ),
-                Positioned(
-                  bottom: 12,
-                  left: 16,
-                  child: TranslationBuilder(
-                    builder: (context) => Text(
-                      event["eventName"] ?? 'untitled_event'.tr,
+                  Positioned(
+                    bottom: 12,
+                    left: 16,
+                    child: Text(
+                      event["eventName"] ?? "Untitled Event",
                       style: const TextStyle(
                         color: Colors.orangeAccent,
                         fontSize: 18,
@@ -171,51 +172,47 @@ class _PastEventsPageState extends State<PastEventsPage> {
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
 
-          // 🏆 Event Info
-          Padding(
-            padding: const EdgeInsets.all(14),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (event["eventIntro"] != null)
-                  Text(
-                    event["eventIntro"],
-                    style: const TextStyle(
-                      color: Colors.white70,
-                      height: 1.5,
+            // 🏆 Event Info
+            Padding(
+              padding: const EdgeInsets.all(14),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (event["eventIntro"] != null)
+                    Text(
+                      event["eventIntro"],
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        height: 1.5,
+                      ),
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    maxLines: 3,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                const SizedBox(height: 10),
-                Row(
-                  children: [
-                    const Icon(Icons.calendar_today,
-                        size: 14, color: Colors.orangeAccent),
-                    const SizedBox(width: 6),
-                    TranslationBuilder(
-                      builder: (context) => Text(
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      const Icon(Icons.calendar_today,
+                          size: 14, color: Colors.orangeAccent),
+                      const SizedBox(width: 6),
+                      Text(
                         event["eventDate"]?.substring(0, 10) ??
-                            'unknown_date'.tr,
+                            "Unknown Date",
                         style: const TextStyle(
                           color: Colors.white70,
                           fontSize: 13,
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 14),
-                    const Icon(Icons.location_on,
-                        size: 14, color: Colors.orangeAccent),
-                    const SizedBox(width: 6),
-                    Expanded(
-                      child: TranslationBuilder(
-                        builder: (context) => Text(
-                          event["eventLocation"] ?? 'unknown_location'.tr,
+                      const SizedBox(width: 14),
+                      const Icon(Icons.location_on,
+                          size: 14, color: Colors.orangeAccent),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Text(
+                          event["eventLocation"] ?? "Unknown Location",
                           style: const TextStyle(
                             color: Colors.white70,
                             fontSize: 13,
@@ -223,34 +220,32 @@ class _PastEventsPageState extends State<PastEventsPage> {
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                Container(
-                  padding:
-                  const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [Colors.grey, Colors.blueGrey],
-                    ),
-                    borderRadius: BorderRadius.circular(8),
+                    ],
                   ),
-                  child: TranslationBuilder(
-                    builder: (context) => Text(
-                      'ended'.tr,
-                      style: const TextStyle(
+                  const SizedBox(height: 12),
+                  Container(
+                    padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Colors.grey, Colors.blueGrey],
+                      ),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Text(
+                      "ENDED",
+                      style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
                         fontSize: 12,
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

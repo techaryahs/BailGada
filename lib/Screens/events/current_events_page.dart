@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import '../../utils/translation_helper.dart';
 import '../EventDetailsScreen.dart';
 
 class CurrentEventsPage extends StatefulWidget {
@@ -26,27 +25,23 @@ class _CurrentEventsPageState extends State<CurrentEventsPage> {
         }
 
         if (snapshot.hasError) {
-          return TranslationBuilder(
-            builder: (context) => Center(
-              child: Text('error_loading_events'.tr,
-                  style: const TextStyle(color: Colors.redAccent)),
-            ),
+          return const Center(
+            child: Text("Error loading events",
+                style: TextStyle(color: Colors.redAccent)),
           );
         }
 
         if (!snapshot.hasData || snapshot.data?.snapshot.value == null) {
-          return TranslationBuilder(
-            builder: (context) => Center(
-              child: Text(
-                'no_current_events'.tr,
-                style: const TextStyle(color: Colors.white70, fontSize: 16),
-              ),
+          return const Center(
+            child: Text(
+              "No current events available.",
+              style: TextStyle(color: Colors.white70, fontSize: 16),
             ),
           );
         }
 
         final data = Map<dynamic, dynamic>.from(
-            snapshot.data!.snapshot.value as Map);
+            (snapshot.data! as DatabaseEvent).snapshot.value as Map);
         final allEvents = data.entries.map((e) {
           return Map<String, dynamic>.from(e.value);
         }).toList();
@@ -67,37 +62,33 @@ class _CurrentEventsPageState extends State<CurrentEventsPage> {
         }).toList();
 
         if (currentEvents.isEmpty) {
-          return TranslationBuilder(
-            builder: (context) => Center(
-              child: Text(
-                'no_ongoing_upcoming_events'.tr,
-                style: const TextStyle(color: Colors.white70, fontSize: 16),
-              ),
+          return const Center(
+            child: Text(
+              "No ongoing or upcoming events found.",
+              style: TextStyle(color: Colors.white70, fontSize: 16),
             ),
           );
         }
 
-        return TranslationBuilder(
-          builder: (context) => SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "🔥 ${'current_events'.tr}",
-                  style: const TextStyle(
-                    color: Colors.orange,
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    shadows: [
-                      Shadow(color: Colors.orangeAccent, blurRadius: 1),
-                    ],
-                  ),
+        return SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                "🔥 Current Events",
+                style: TextStyle(
+                  color: Colors.orange,
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  shadows: [
+                    Shadow(color: Colors.orangeAccent, blurRadius: 1),
+                  ],
                 ),
-                const SizedBox(height: 20),
-                ...currentEvents.map((event) => _buildEventCard(context, event)),
-              ],
-            ),
+              ),
+              const SizedBox(height: 20),
+              ...currentEvents.map((event) => _buildEventCard(context, event)),
+            ],
           ),
         );
       },
@@ -168,17 +159,15 @@ class _CurrentEventsPageState extends State<CurrentEventsPage> {
                     bottom: 0,
                     left: 16,
                     right: 16,
-                    child: TranslationBuilder(
-                      builder: (context) => Text(
-                        event["eventName"] ?? 'untitled_event'.tr,
-                        style: const TextStyle(
-                          color: Colors.orangeAccent,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          shadows: [
-                            Shadow(color: Colors.black, blurRadius: 6),
-                          ],
-                        ),
+                    child: Text(
+                      event["eventName"] ?? "Untitled Event",
+                      style: const TextStyle(
+                        color: Colors.orangeAccent,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        shadows: [
+                          Shadow(color: Colors.black, blurRadius: 6),
+                        ],
                       ),
                     ),
                   ),
@@ -201,13 +190,11 @@ class _CurrentEventsPageState extends State<CurrentEventsPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        TranslationBuilder(
-                          builder: (context) => Text(
-                            event["eventName"] ?? 'unknown_host'.tr,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
+                        Text(
+                          event["eventName"] ?? "Unknown Host",
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                         Row(
@@ -216,13 +203,11 @@ class _CurrentEventsPageState extends State<CurrentEventsPage> {
                                 size: 14, color: Colors.orangeAccent),
                             const SizedBox(width: 4),
                             Flexible(
-                              child: TranslationBuilder(
-                                builder: (context) => Text(
-                                  event["eventLocation"] ?? 'unknown_location'.tr,
-                                  style: const TextStyle(
-                                      color: Colors.white70, fontSize: 12),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
+                              child: Text(
+                                event["eventLocation"] ?? "Unknown Location",
+                                style: const TextStyle(
+                                    color: Colors.white70, fontSize: 12),
+                                overflow: TextOverflow.ellipsis,
                               ),
                             ),
                           ],
@@ -239,14 +224,12 @@ class _CurrentEventsPageState extends State<CurrentEventsPage> {
                       ),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: TranslationBuilder(
-                      builder: (context) => Text(
-                        'live'.tr,
-                        style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 12),
-                      ),
+                    child: const Text(
+                      "LIVE",
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12),
                     ),
                   ),
                 ],

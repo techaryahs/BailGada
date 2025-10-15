@@ -1,41 +1,14 @@
 import 'package:flutter/material.dart';
-import '../utils/translation_helper.dart';
 
-/// 🎯 EventCategoryBar Widget
-/// Displays a top navigation bar with tabs:
-/// 🔸 Current Events | 🔹 Upcoming Events | ⚫ Past Events
-///
-/// Use it like:
-/// ```dart
-/// EventCategoryBar(
-///   onCategoryChanged: (category) {
-///     print("Selected: $category");
-///   },
-/// )
-/// ```
-
-class EventCategoryBar extends StatefulWidget {
+class EventCategoryBar extends StatelessWidget {
   final Function(String) onCategoryChanged;
-  final String initialCategory;
+  final String selectedCategory;
 
   const EventCategoryBar({
     super.key,
     required this.onCategoryChanged,
-    this.initialCategory = 'Current',
+    required this.selectedCategory,
   });
-
-  @override
-  State<EventCategoryBar> createState() => _EventCategoryBarState();
-}
-
-class _EventCategoryBarState extends State<EventCategoryBar> {
-  late String selected;
-
-  @override
-  void initState() {
-    super.initState();
-    selected = widget.initialCategory;
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,11 +33,11 @@ class _EventCategoryBarState extends State<EventCategoryBar> {
         child: Row(
           children: [
             const SizedBox(width: 12),
-            _buildTabButton('Current', Icons.local_fire_department, Colors.orange),
+            _buildTabButton(context, 'Current', Icons.local_fire_department, Colors.orange),
             const SizedBox(width: 12),
-            _buildTabButton('Upcoming', Icons.event_available_rounded, Colors.green),
+            _buildTabButton(context, 'Upcoming', Icons.event_available_rounded, Colors.green),
             const SizedBox(width: 12),
-            _buildTabButton('Past', Icons.history, Colors.grey),
+            _buildTabButton(context, 'Past', Icons.history, Colors.grey),
             const SizedBox(width: 12),
           ],
         ),
@@ -72,47 +45,39 @@ class _EventCategoryBarState extends State<EventCategoryBar> {
     );
   }
 
+  Widget _buildTabButton(BuildContext context, String label, IconData icon, Color activeColor) {
+    final bool isSelected = selectedCategory == label;
 
-  Widget _buildTabButton(String label, IconData icon, Color activeColor) {
-    final bool isSelected = selected == label;
-    final String translationKey = label == 'Current' ? 'current_events' : 
-                                   label == 'Upcoming' ? 'upcoming_events' : 'past_events';
-
-    return TranslationBuilder(
-      builder: (context) => GestureDetector(
-        onTap: () {
-          setState(() => selected = label);
-          widget.onCategoryChanged(label);
-        },
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 250),
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-          decoration: BoxDecoration(
-            color: isSelected ? activeColor.withOpacity(0.15) : Colors.transparent,
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(
-              color: isSelected ? activeColor : Colors.white24,
-              width: isSelected ? 1.6 : 1,
+    return GestureDetector(
+      onTap: () => onCategoryChanged(label),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 250),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        decoration: BoxDecoration(
+          color: isSelected ? activeColor.withOpacity(0.15) : Colors.transparent,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(
+            color: isSelected ? activeColor : Colors.white24,
+            width: isSelected ? 1.6 : 1,
+          ),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              icon,
+              color: isSelected ? activeColor : Colors.white70,
+              size: 18,
             ),
-          ),
-          child: Row(
-            children: [
-              Icon(
-                icon,
+            const SizedBox(width: 6),
+            Text(
+              label,
+              style: TextStyle(
                 color: isSelected ? activeColor : Colors.white70,
-                size: 18,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                fontSize: 13,
               ),
-              const SizedBox(width: 6),
-              Text(
-                translationKey.tr,
-                style: TextStyle(
-                  color: isSelected ? activeColor : Colors.white70,
-                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                  fontSize: 13,
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

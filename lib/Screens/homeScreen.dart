@@ -1,11 +1,10 @@
 import 'package:bailgada/Screens/profileScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import '../driver/Screens/driver_screen.dart';
+import '../host/Screens/host_screen.dart';
 import '../widgets/bottombar.dart';
 import '../widgets/event_category_bar.dart';
-import '../widgets/translation_preload_indicator.dart';
-import '../utils/translation_helper.dart';
-import '../services/translation_service.dart';
 import 'events/current_events_page.dart';
 import 'events/past_event_page.dart';
 import 'events/upcoming_events_page.dart';
@@ -28,30 +27,22 @@ class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0; // for bottom nav
   String selectedCategory = 'Current';
 
-  String _getNameForLanguage(String baseName) {
-    final translationService = TranslationService();
-    if (translationService.currentLanguage == 'mr') {
-      return '${baseName}_mr'.tr;
-    }
-    return baseName.tr;
-  }
 
-
-  List<Map<String, String>> get _carouselItems => [
+  final List<Map<String, String>> _carouselItems = [
     {
       "image": "assets/images/bailgada_poster.png",
-      "title": 'carousel_title_1'.tr,
-      "subtitle": 'carousel_subtitle_1'.tr,
+      "title": "Welcome to BullCart Race",
+      "subtitle": "Feel the speed, embrace the tradition",
     },
     {
       "image": "assets/images/bailgada_poster.png",
-      "title": 'carousel_title_2'.tr,
-      "subtitle": 'carousel_subtitle_2'.tr,
+      "title": "Register Your Team",
+      "subtitle": "Show your strength on the track",
     },
     {
       "image": "assets/images/bailgada_poster.png",
-      "title": 'carousel_title_3'.tr,
-      "subtitle": 'carousel_subtitle_3'.tr,
+      "title": "Cheer Live Action",
+      "subtitle": "Support your favorite riders",
     },
   ];
 
@@ -80,8 +71,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildHomeContent() {
     final screenHeight = MediaQuery.of(context).size.height;
 
-    return TranslationBuilder(
-      builder: (context) => SafeArea(
+    return SafeArea(
       child: SingleChildScrollView(
         padding: const EdgeInsets.only(bottom: 20),
         child: Column(
@@ -177,12 +167,14 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
 
             EventCategoryBar(
+              selectedCategory: selectedCategory, // controlled by parent
               onCategoryChanged: (category) {
                 setState(() {
                   selectedCategory = category;
                 });
               },
             ),
+
 
             const SizedBox(height: 10),
 
@@ -193,6 +185,7 @@ class _HomeScreenState extends State<HomeScreen> {
             else
               const PastEventsPage(),
 
+
             const SizedBox(height: 20),
 
             // 🏆 Top Racers Section
@@ -202,9 +195,9 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    "🏆 ${'top_racers'.tr}",
-                    style: const TextStyle(
+                  const Text(
+                    "🏆 Top Racers",
+                    style: TextStyle(
                       color: Colors.orange,
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
@@ -241,7 +234,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         _buildCrazyRacerCard(
                           context,
                           rank: 1,
-                          name: _getNameForLanguage('rohit_pawar'),
+                          name: "Rohit Pawar",
                           image: "assets/images/bailgada_poster.png",
                           color: Colors.amberAccent,
                         ),
@@ -249,7 +242,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         _buildCrazyRacerCard(
                           context,
                           rank: 2,
-                          name: _getNameForLanguage('suresh_patil'),
+                          name: "Suresh Patil",
                           image: "assets/images/bailgada_poster.png",
                           color: Colors.grey.shade300,
                         ),
@@ -257,7 +250,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         _buildCrazyRacerCard(
                           context,
                           rank: 3,
-                          name: _getNameForLanguage('vikram_jadhav'),
+                          name: "Vikram Jadhav",
                           image: "assets/images/bailgada_poster.png",
                           color: Colors.brown.shade300,
                         ),
@@ -279,14 +272,14 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                               borderRadius: BorderRadius.circular(30),
                             ),
-                            child: Row(
+                            child: const Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                const Icon(Icons.bar_chart, color: Colors.white),
-                                const SizedBox(width: 8),
+                                Icon(Icons.bar_chart, color: Colors.white),
+                                SizedBox(width: 8),
                                 Text(
-                                  'view_full_leaderboard'.tr,
-                                  style: const TextStyle(
+                                  "View Full Leaderboard",
+                                  style: TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -306,7 +299,6 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
       ),
-      ),
     );
   }
 
@@ -319,19 +311,18 @@ class _HomeScreenState extends State<HomeScreen> {
 
     ];
 
-    return TranslationPreloadIndicator(
-      child: Scaffold(
-        backgroundColor: Colors.black,
-        body: pages[_selectedIndex],
-        bottomNavigationBar: BottomNavBar(
-          selectedIndex: _selectedIndex,
-          onTap: (index) {
-            setState(() {
-              _selectedIndex = index;
-            });
-          },
-        ),
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: pages[_selectedIndex],
+      bottomNavigationBar: BottomNavBar(
+        selectedIndex: _selectedIndex,
+        onTap: (index) {
+          setState(() {
+            _selectedIndex = index;
+          });
+        },
       ),
+
     );
   }
 }
