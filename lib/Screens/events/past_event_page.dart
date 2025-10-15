@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import '../../utils/translation_helper.dart';
 
 class PastEventsPage extends StatefulWidget {
   const PastEventsPage({super.key});
@@ -25,26 +26,30 @@ class _PastEventsPageState extends State<PastEventsPage> {
         }
 
         if (snapshot.hasError) {
-          return const Center(
-            child: Text(
-              "⚠️ Error loading past events",
-              style: TextStyle(color: Colors.redAccent),
+          return TranslationBuilder(
+            builder: (context) => Center(
+              child: Text(
+                'error_loading_past_events'.tr,
+                style: const TextStyle(color: Colors.redAccent),
+              ),
             ),
           );
         }
 
         if (!snapshot.hasData || snapshot.data?.snapshot.value == null) {
-          return const Center(
-            child: Text(
-              "No past events available.",
-              style: TextStyle(color: Colors.white70, fontSize: 16),
+          return TranslationBuilder(
+            builder: (context) => Center(
+              child: Text(
+                'no_past_events_available'.tr,
+                style: const TextStyle(color: Colors.white70, fontSize: 16),
+              ),
             ),
           );
         }
 
         // Convert Firebase data into list
         final data = Map<dynamic, dynamic>.from(
-            (snapshot.data! as DatabaseEvent).snapshot.value as Map);
+            snapshot.data!.snapshot.value as Map);
         final allEvents = data.entries.map((e) {
           return Map<String, dynamic>.from(e.value);
         }).toList();
@@ -64,33 +69,37 @@ class _PastEventsPageState extends State<PastEventsPage> {
         }).toList();
 
         if (pastEvents.isEmpty) {
-          return const Center(
-            child: Text(
-              "⏳ No past events found.",
-              style: TextStyle(color: Colors.white70),
+          return TranslationBuilder(
+            builder: (context) => Center(
+              child: Text(
+                "⏳ ${'no_past_events'.tr}",
+                style: const TextStyle(color: Colors.white70),
+              ),
             ),
           );
         }
 
-        return SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                "⏳ Past Events",
-                style: TextStyle(
-                  color: Colors.orangeAccent,
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                  shadows: [Shadow(color: Colors.orange, blurRadius: 2)],
+        return TranslationBuilder(
+          builder: (context) => SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "⏳ ${'past_events'.tr}",
+                  style: const TextStyle(
+                    color: Colors.orangeAccent,
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    shadows: [Shadow(color: Colors.orange, blurRadius: 2)],
+                  ),
                 ),
-              ),
-              const SizedBox(height: 16),
+                const SizedBox(height: 16),
 
-              // 🧾 Past Event Cards
-              ...pastEvents.map((event) => _buildPastEventCard(event)),
-            ],
+                // 🧾 Past Event Cards
+                ...pastEvents.map((event) => _buildPastEventCard(event)),
+              ],
+            ),
           ),
         );
       },
@@ -151,13 +160,15 @@ class _PastEventsPageState extends State<PastEventsPage> {
                 Positioned(
                   bottom: 12,
                   left: 16,
-                  child: Text(
-                    event["eventName"] ?? "Untitled Event",
-                    style: const TextStyle(
-                      color: Colors.orangeAccent,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      shadows: [Shadow(color: Colors.black, blurRadius: 6)],
+                  child: TranslationBuilder(
+                    builder: (context) => Text(
+                      event["eventName"] ?? 'untitled_event'.tr,
+                      style: const TextStyle(
+                        color: Colors.orangeAccent,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        shadows: [Shadow(color: Colors.black, blurRadius: 6)],
+                      ),
                     ),
                   ),
                 ),
@@ -187,12 +198,14 @@ class _PastEventsPageState extends State<PastEventsPage> {
                     const Icon(Icons.calendar_today,
                         size: 14, color: Colors.orangeAccent),
                     const SizedBox(width: 6),
-                    Text(
-                      event["eventDate"]?.substring(0, 10) ??
-                          "Unknown Date",
-                      style: const TextStyle(
-                        color: Colors.white70,
-                        fontSize: 13,
+                    TranslationBuilder(
+                      builder: (context) => Text(
+                        event["eventDate"]?.substring(0, 10) ??
+                            'unknown_date'.tr,
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 13,
+                        ),
                       ),
                     ),
                     const SizedBox(width: 14),
@@ -200,13 +213,15 @@ class _PastEventsPageState extends State<PastEventsPage> {
                         size: 14, color: Colors.orangeAccent),
                     const SizedBox(width: 6),
                     Expanded(
-                      child: Text(
-                        event["eventLocation"] ?? "Unknown Location",
-                        style: const TextStyle(
-                          color: Colors.white70,
-                          fontSize: 13,
+                      child: TranslationBuilder(
+                        builder: (context) => Text(
+                          event["eventLocation"] ?? 'unknown_location'.tr,
+                          style: const TextStyle(
+                            color: Colors.white70,
+                            fontSize: 13,
+                          ),
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                   ],
@@ -221,12 +236,14 @@ class _PastEventsPageState extends State<PastEventsPage> {
                     ),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Text(
-                    "ENDED",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 12,
+                  child: TranslationBuilder(
+                    builder: (context) => Text(
+                      'ended'.tr,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12,
+                      ),
                     ),
                   ),
                 ),

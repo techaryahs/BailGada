@@ -1,24 +1,26 @@
 import 'package:flutter/material.dart';
+import '../../utils/translation_helper.dart';
 
 class DriverScreen extends StatelessWidget {
   const DriverScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      appBar: AppBar(
-        backgroundColor: Colors.orange,
-        elevation: 0,
-        centerTitle: true,
-        title: const Text(
-          "Driver Dashboard",
-          style: TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.bold,
+    return TranslationBuilder(
+      builder: (context) => Scaffold(
+        backgroundColor: Colors.black,
+        appBar: AppBar(
+          backgroundColor: Colors.orange,
+          elevation: 0,
+          centerTitle: true,
+          title: Text(
+            'driver_dashboard'.tr,
+            style: const TextStyle(
+              color: Colors.black,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
-      ),
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
         padding: const EdgeInsets.all(16),
@@ -75,11 +77,11 @@ class DriverScreen extends StatelessWidget {
                 _buildActionCard(
                   context,
                   icon: Icons.assignment_outlined,
-                  title: "My Races",
+                  title: 'my_races'.tr,
                   onTap: () {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text("My Races clicked!"),
+                      SnackBar(
+                        content: Text('my_races'.tr),
                         backgroundColor: Colors.orange,
                       ),
                     );
@@ -88,19 +90,19 @@ class DriverScreen extends StatelessWidget {
                 _buildActionCard(
                   context,
                   icon: Icons.timer,
-                  title: "Race Timings",
+                  title: 'race_history'.tr,
                   onTap: () {},
                 ),
                 _buildActionCard(
                   context,
                   icon: Icons.analytics,
-                  title: "Performance",
+                  title: 'event_analytics'.tr,
                   onTap: () {},
                 ),
                 _buildActionCard(
                   context,
                   icon: Icons.directions_car,
-                  title: "My Bullocks",
+                  title: 'driver'.tr,
                   onTap: () {},
                 ),
               ],
@@ -120,30 +122,35 @@ class DriverScreen extends StatelessWidget {
             const SizedBox(height: 12),
 
             _buildStatsCard(
+              context,
               icon: Icons.star,
-              label: "Total Races Completed",
+              label: 'total_races_completed'.tr,
               value: "28",
             ),
             const SizedBox(height: 12),
             _buildStatsCard(
+              context,
               icon: Icons.emoji_events,
-              label: "Races Won",
+              label: 'races_won'.tr,
               value: "11",
             ),
             const SizedBox(height: 12),
             _buildStatsCard(
+              context,
               icon: Icons.speed,
-              label: "Average Speed",
+              label: 'average_speed'.tr,
               value: "65 km/h",
             ),
             const SizedBox(height: 12),
             _buildStatsCard(
+              context,
               icon: Icons.attach_money,
-              label: "Total Earnings",
+              label: 'total_earnings'.tr,
               value: "₹1.5L",
             ),
           ],
         ),
+      ),
       ),
     );
   }
@@ -183,7 +190,8 @@ class DriverScreen extends StatelessWidget {
   }
 
   /// 📊 Helper Widget: Stats Card
-  Widget _buildStatsCard({
+  Widget _buildStatsCard(
+    BuildContext context, {
     required IconData icon,
     required String label,
     required String value,

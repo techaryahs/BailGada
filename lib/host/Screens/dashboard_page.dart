@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../widgets/bottom_nav_bar.dart';
-import 'event_creation_page.dart';
 import 'host_dashboard_screen.dart';
 import 'host_payment_screen.dart';
 import 'host_screen.dart';

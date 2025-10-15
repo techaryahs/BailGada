@@ -1,10 +1,11 @@
 import 'package:bailgada/Screens/profileScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import '../driver/Screens/driver_screen.dart';
-import '../host/Screens/host_screen.dart';
 import '../widgets/bottombar.dart';
 import '../widgets/event_category_bar.dart';
+import '../widgets/translation_preload_indicator.dart';
+import '../utils/translation_helper.dart';
+import '../services/translation_service.dart';
 import 'events/current_events_page.dart';
 import 'events/past_event_page.dart';
 import 'events/upcoming_events_page.dart';
@@ -27,22 +28,30 @@ class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0; // for bottom nav
   String selectedCategory = 'Current';
 
+  String _getNameForLanguage(String baseName) {
+    final translationService = TranslationService();
+    if (translationService.currentLanguage == 'mr') {
+      return '${baseName}_mr'.tr;
+    }
+    return baseName.tr;
+  }
 
-  final List<Map<String, String>> _carouselItems = [
+
+  List<Map<String, String>> get _carouselItems => [
     {
       "image": "assets/images/bailgada_poster.png",
-      "title": "Welcome to BullCart Race",
-      "subtitle": "Feel the speed, embrace the tradition",
+      "title": 'carousel_title_1'.tr,
+      "subtitle": 'carousel_subtitle_1'.tr,
     },
     {
       "image": "assets/images/bailgada_poster.png",
-      "title": "Register Your Team",
-      "subtitle": "Show your strength on the track",
+      "title": 'carousel_title_2'.tr,
+      "subtitle": 'carousel_subtitle_2'.tr,
     },
     {
       "image": "assets/images/bailgada_poster.png",
-      "title": "Cheer Live Action",
-      "subtitle": "Support your favorite riders",
+      "title": 'carousel_title_3'.tr,
+      "subtitle": 'carousel_subtitle_3'.tr,
     },
   ];
 
@@ -71,7 +80,8 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildHomeContent() {
     final screenHeight = MediaQuery.of(context).size.height;
 
-    return SafeArea(
+    return TranslationBuilder(
+      builder: (context) => SafeArea(
       child: SingleChildScrollView(
         padding: const EdgeInsets.only(bottom: 20),
         child: Column(
@@ -192,9 +202,9 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    "🏆 Top Racers",
-                    style: TextStyle(
+                  Text(
+                    "🏆 ${'top_racers'.tr}",
+                    style: const TextStyle(
                       color: Colors.orange,
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
@@ -231,7 +241,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         _buildCrazyRacerCard(
                           context,
                           rank: 1,
-                          name: "Rohit Pawar",
+                          name: _getNameForLanguage('rohit_pawar'),
                           image: "assets/images/bailgada_poster.png",
                           color: Colors.amberAccent,
                         ),
@@ -239,7 +249,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         _buildCrazyRacerCard(
                           context,
                           rank: 2,
-                          name: "Suresh Patil",
+                          name: _getNameForLanguage('suresh_patil'),
                           image: "assets/images/bailgada_poster.png",
                           color: Colors.grey.shade300,
                         ),
@@ -247,7 +257,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         _buildCrazyRacerCard(
                           context,
                           rank: 3,
-                          name: "Vikram Jadhav",
+                          name: _getNameForLanguage('vikram_jadhav'),
                           image: "assets/images/bailgada_poster.png",
                           color: Colors.brown.shade300,
                         ),
@@ -269,14 +279,14 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                               borderRadius: BorderRadius.circular(30),
                             ),
-                            child: const Row(
+                            child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Icon(Icons.bar_chart, color: Colors.white),
-                                SizedBox(width: 8),
+                                const Icon(Icons.bar_chart, color: Colors.white),
+                                const SizedBox(width: 8),
                                 Text(
-                                  "View Full Leaderboard",
-                                  style: TextStyle(
+                                  'view_full_leaderboard'.tr,
+                                  style: const TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -296,6 +306,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
       ),
+      ),
     );
   }
 
@@ -308,18 +319,19 @@ class _HomeScreenState extends State<HomeScreen> {
 
     ];
 
-    return Scaffold(
-      backgroundColor: Colors.black,
-      body: pages[_selectedIndex],
-      bottomNavigationBar: BottomNavBar(
-        selectedIndex: _selectedIndex,
-        onTap: (index) {
-          setState(() {
-            _selectedIndex = index;
-          });
-        },
+    return TranslationPreloadIndicator(
+      child: Scaffold(
+        backgroundColor: Colors.black,
+        body: pages[_selectedIndex],
+        bottomNavigationBar: BottomNavBar(
+          selectedIndex: _selectedIndex,
+          onTap: (index) {
+            setState(() {
+              _selectedIndex = index;
+            });
+          },
+        ),
       ),
-
     );
   }
 }

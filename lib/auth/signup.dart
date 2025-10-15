@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'dart:convert';
-import 'dart:ui';
 import 'package:crypto/crypto.dart';
+import '../utils/translation_helper.dart';
 import 'signin.dart';
 
 class SignUp extends StatefulWidget {
@@ -38,7 +38,7 @@ class _SignUpState extends State<SignUp> {
     if (!_formKey.currentState!.validate()) return;
 
     if (!acceptTerms) {
-      _showMessage("Please accept the Terms and Conditions");
+      _showMessage('please_accept_terms'.tr);
       return;
     }
 
@@ -67,7 +67,7 @@ class _SignUpState extends State<SignUp> {
       });
 
       if (mounted) {
-        _showMessage("User registered successfully!");
+        _showMessage('registration_success'.tr);
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const SignIn()),
@@ -75,7 +75,7 @@ class _SignUpState extends State<SignUp> {
       }
 
     } catch (e) {
-      _showMessage("Error: $e");
+      _showMessage("${'error'.tr}: $e");
     } finally {
       if (mounted) {
         setState(() => isLoading = false);
@@ -96,8 +96,9 @@ class _SignUpState extends State<SignUp> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
+    return TranslationBuilder(
+      builder: (context) => Scaffold(
+        body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
@@ -147,9 +148,9 @@ class _SignUpState extends State<SignUp> {
                     shaderCallback: (bounds) => LinearGradient(
                       colors: [AppColors.primary, AppColors.darkOrange],
                     ).createShader(bounds),
-                    child: const Text(
-                      "Create Account",
-                      style: TextStyle(
+                    child: Text(
+                      'create_new_account'.tr,
+                      style: const TextStyle(
                         fontSize: 32,
                         fontWeight: FontWeight.w900,
                         color: Colors.white,
@@ -159,7 +160,7 @@ class _SignUpState extends State<SignUp> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    "Join BailGada Race today",
+                    'sign_up'.tr,
                     style: TextStyle(
                       fontSize: 16,
                       color: AppColors.secondary.withOpacity(0.7),
@@ -187,11 +188,11 @@ class _SignUpState extends State<SignUp> {
                         children: [
                           _buildTextField(
                             controller: _nameController,
-                            label: "Full Name",
+                            label: 'full_name'.tr,
                             icon: Icons.person_rounded,
                             validator: (value) {
                               if (value == null || value.trim().isEmpty) {
-                                return 'Please enter your name';
+                                return 'field_required'.tr;
                               }
                               return null;
                             },
@@ -199,16 +200,16 @@ class _SignUpState extends State<SignUp> {
                           const SizedBox(height: 16),
                           _buildTextField(
                             controller: _emailController,
-                            label: "Email Address",
+                            label: 'email'.tr,
                             icon: Icons.email_rounded,
                             keyboardType: TextInputType.emailAddress,
                             validator: (value) {
                               if (value == null || value.trim().isEmpty) {
-                                return 'Please enter your email';
+                                return 'field_required'.tr;
                               }
                               if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
                                   .hasMatch(value)) {
-                                return 'Please enter a valid email';
+                                return 'invalid_email'.tr;
                               }
                               return null;
                             },
@@ -216,7 +217,7 @@ class _SignUpState extends State<SignUp> {
                           const SizedBox(height: 16),
                           _buildTextField(
                             controller: _phoneController,
-                            label: "Phone Number",
+                            label: 'phone'.tr,
                             icon: Icons.phone_rounded,
                             keyboardType: TextInputType.phone,
                             inputFormatters: [
@@ -225,10 +226,10 @@ class _SignUpState extends State<SignUp> {
                             ],
                             validator: (value) {
                               if (value == null || value.trim().isEmpty) {
-                                return 'Please enter your phone number';
+                                return 'field_required'.tr;
                               }
                               if (value.length != 10) {
-                                return 'Please enter a valid 10-digit number';
+                                return 'field_required'.tr;
                               }
                               return null;
                             },
@@ -236,15 +237,15 @@ class _SignUpState extends State<SignUp> {
                           const SizedBox(height: 16),
                           _buildTextField(
                             controller: _passwordController,
-                            label: "Password",
+                            label: 'password'.tr,
                             icon: Icons.lock_rounded,
                             obscure: true,
                             validator: (value) {
                               if (value == null || value.trim().isEmpty) {
-                                return 'Please enter your password';
+                                return 'field_required'.tr;
                               }
                               if (value.length < 6) {
-                                return 'Password must be at least 6 characters';
+                                return 'password_too_short'.tr;
                               }
                               return null;
                             },
@@ -252,15 +253,15 @@ class _SignUpState extends State<SignUp> {
                           const SizedBox(height: 16),
                           _buildTextField(
                             controller: _confirmPasswordController,
-                            label: "Confirm Password",
+                            label: 'confirm_password'.tr,
                             icon: Icons.lock_rounded,
                             obscure: true,
                             validator: (value) {
                               if (value == null || value.trim().isEmpty) {
-                                return 'Please confirm your password';
+                                return 'field_required'.tr;
                               }
                               if (value != _passwordController.text) {
-                                return 'Passwords do not match';
+                                return 'passwords_dont_match'.tr;
                               }
                               return null;
                             },
@@ -279,7 +280,7 @@ class _SignUpState extends State<SignUp> {
                               ),
                               Expanded(
                                 child: Text(
-                                  'I agree to the Terms & Conditions',
+                                  'accept_terms'.tr,
                                   style: TextStyle(
                                     color: AppColors.secondary.withOpacity(0.7),
                                     fontSize: 14,
@@ -325,9 +326,9 @@ class _SignUpState extends State<SignUp> {
                                   strokeWidth: 3,
                                 ),
                               )
-                                  : const Text(
-                                "Sign Up",
-                                style: TextStyle(
+                                  : Text(
+                                'sign_up'.tr,
+                                style: const TextStyle(
                                   fontSize: 18,
                                   color: Colors.white,
                                   fontWeight: FontWeight.bold,
@@ -346,7 +347,7 @@ class _SignUpState extends State<SignUp> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        "Already have an account? ",
+                        '${'already_have_account'.tr} ',
                         style: TextStyle(
                           color: AppColors.secondary.withOpacity(0.7),
                           fontSize: 15,
@@ -360,9 +361,9 @@ class _SignUpState extends State<SignUp> {
                           shaderCallback: (bounds) => LinearGradient(
                             colors: [AppColors.primary, AppColors.darkOrange],
                           ).createShader(bounds),
-                          child: const Text(
-                            "Sign In",
-                            style: TextStyle(
+                          child: Text(
+                            'sign_in'.tr,
+                            style: const TextStyle(
                               color: Colors.white,
                               fontSize: 15,
                               fontWeight: FontWeight.bold,
@@ -378,6 +379,7 @@ class _SignUpState extends State<SignUp> {
             ),
           ),
         ),
+      ),
       ),
     );
   }

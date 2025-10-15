@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../utils/translation_helper.dart';
 
 /// 🎯 EventCategoryBar Widget
 /// Displays a top navigation bar with tabs:
@@ -37,7 +38,6 @@ class _EventCategoryBarState extends State<EventCategoryBar> {
   }
 
   @override
-  @override
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
@@ -75,40 +75,44 @@ class _EventCategoryBarState extends State<EventCategoryBar> {
 
   Widget _buildTabButton(String label, IconData icon, Color activeColor) {
     final bool isSelected = selected == label;
+    final String translationKey = label == 'Current' ? 'current_events' : 
+                                   label == 'Upcoming' ? 'upcoming_events' : 'past_events';
 
-    return GestureDetector(
-      onTap: () {
-        setState(() => selected = label);
-        widget.onCategoryChanged(label);
-      },
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 250),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-        decoration: BoxDecoration(
-          color: isSelected ? activeColor.withOpacity(0.15) : Colors.transparent,
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(
-            color: isSelected ? activeColor : Colors.white24,
-            width: isSelected ? 1.6 : 1,
+    return TranslationBuilder(
+      builder: (context) => GestureDetector(
+        onTap: () {
+          setState(() => selected = label);
+          widget.onCategoryChanged(label);
+        },
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 250),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          decoration: BoxDecoration(
+            color: isSelected ? activeColor.withOpacity(0.15) : Colors.transparent,
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(
+              color: isSelected ? activeColor : Colors.white24,
+              width: isSelected ? 1.6 : 1,
+            ),
           ),
-        ),
-        child: Row(
-          children: [
-            Icon(
-              icon,
-              color: isSelected ? activeColor : Colors.white70,
-              size: 18,
-            ),
-            const SizedBox(width: 6),
-            Text(
-              label,
-              style: TextStyle(
+          child: Row(
+            children: [
+              Icon(
+                icon,
                 color: isSelected ? activeColor : Colors.white70,
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                fontSize: 13,
+                size: 18,
               ),
-            ),
-          ],
+              const SizedBox(width: 6),
+              Text(
+                translationKey.tr,
+                style: TextStyle(
+                  color: isSelected ? activeColor : Colors.white70,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                  fontSize: 13,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

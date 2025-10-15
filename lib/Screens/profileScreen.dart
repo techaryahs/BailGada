@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import '../utils/translation_helper.dart';
 import '../host/Screens/dashboard_page.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -96,22 +96,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      appBar: AppBar(
-        elevation: 0,
-        title: const Text(
-          "Profile",
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+    return TranslationBuilder(
+      builder: (context) => Scaffold(
+        backgroundColor: Colors.black,
+        appBar: AppBar(
+          elevation: 0,
+          title: Text(
+            'profile'.tr,
+            style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+          ),
+          backgroundColor: Colors.orange,
+          centerTitle: true,
         ),
-        backgroundColor: Colors.orange,
-        centerTitle: true,
-      ),
-      body: name == null
-          ? const Center(
-        child: CircularProgressIndicator(color: Colors.orange),
-      )
-          : SingleChildScrollView(
+        body: name == null
+            ? const Center(
+          child: CircularProgressIndicator(color: Colors.orange),
+        )
+            : SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
         child: Column(
           children: [
@@ -165,9 +166,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     onPressed: () {
                       // TODO: Navigate to Edit Profile
                     },
-                    child: const Text(
-                      "Edit Profile",
-                      style: TextStyle(
+                    child: Text(
+                      'edit_profile'.tr,
+                      style: const TextStyle(
                           fontSize: 16,
                           color: Colors.black,
                           fontWeight: FontWeight.bold),
@@ -182,22 +183,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
             // ⚙️ Profile Options
             _buildProfileOption(
               icon: Icons.lock,
-              title: "Change Password",
+              title: 'change_password'.tr,
               onTap: () {},
             ),
             _buildProfileOption(
               icon: Icons.notifications,
-              title: "Notifications",
+              title: 'notifications'.tr,
               onTap: () {},
             ),
             _buildProfileOption(
               icon: FontAwesomeIcons.cow,
-              title: "Bail (OX)",
+              title: 'driver'.tr,
               onTap: () {},
             ),
             _buildProfileOption(
               icon: FontAwesomeIcons.crown,
-              title: "Host",
+              title: 'host'.tr,
               onTap: () {
                 Navigator.push(
                   context,
@@ -208,18 +209,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             _buildProfileOption(
               icon: Icons.privacy_tip,
-              title: "Privacy Policy",
+              title: 'privacy'.tr,
               onTap: () {},
             ),
             _buildProfileOption(
               icon: Icons.help,
-              title: "Help & Support",
+              title: 'help'.tr,
               onTap: () {},
             ),
             _buildProfileOption(
               icon: Icons.info,
-              title: "About App",
+              title: 'about'.tr,
               onTap: () {},
+            ),
+            _buildProfileOption(
+              icon: Icons.settings,
+              title: 'settings'.tr,
+              onTap: () {
+                Navigator.pushNamed(context, '/settings');
+              },
             ),
 
             const SizedBox(height: 30),
@@ -238,9 +246,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 onPressed: _showLogoutDialog, // ✅ Show popup
                 icon: const Icon(Icons.logout, color: Colors.white),
-                label: const Text(
-                  "Logout",
-                  style: TextStyle(
+                label: Text(
+                  'logout'.tr,
+                  style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                       color: Colors.white),
@@ -251,6 +259,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             const SizedBox(height: 30),
           ],
         ),
+      ),
       ),
     );
   }
