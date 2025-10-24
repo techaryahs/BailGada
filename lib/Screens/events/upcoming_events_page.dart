@@ -1,84 +1,125 @@
 import 'dart:io';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-
-import '../EventDetailsScreen.dart';
+import '../../widgets/live_translated_text.dart';
+import '../../widgets/dynamic_translated_text.dart';
+import '../../utils/translation_helper.dart';
+import '../../utils/marathi_utils.dart';
+import '../event_details_screen.dart';
 
 class UpcomingEventsPage extends StatefulWidget {
-  const UpcomingEventsPage({super.key});
+  final String userKey;
+
+  const UpcomingEventsPage({
+    super.key,
+    required this.userKey
+  });
 
   @override
   State<UpcomingEventsPage> createState() => _UpcomingEventsPageState();
 }
 
-class _UpcomingEventsPageState extends State<UpcomingEventsPage> {
+class _UpcomingEventsPageState extends State<UpcomingEventsPage> with AutomaticKeepAliveClientMixin {
   final DatabaseReference _eventsRef =
   FirebaseDatabase.instance.ref().child('events');
+  
+  List<Map<String, dynamic>> _cachedEvents = [];
+  bool _isLoading = true;
+  bool _hasError = false;
+
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadEvents();
+  }
+
+  void _loadEvents() async {
+    try {
+      final snapshot = await _eventsRef.once();
+      if (!mounted) return;
+      
+      if (snapshot.snapshot.value == null) {
+        setState(() {
+          _cachedEvents = [];
+          _isLoading = false;
+        });
+        return;
+      }
+
+      final data = Map<dynamic, dynamic>.from(snapshot.snapshot.value as Map);
+      final allEvents = data.entries.map((e) {
+        return Map<String, dynamic>.from(e.value);
+      }).toList();
+
+      final now = DateTime.now();
+      final upcomingEvents = allEvents.where((event) {
+        if (event['eventDate'] == null) return false;
+        try {
+          final date = DateTime.parse(event['eventDate']);
+          return date.isAfter(now);
+        } catch (_) {
+          return false;
+        }
+      }).toList();
+
+      if (mounted) {
+        setState(() {
+          _cachedEvents = upcomingEvents;
+          _isLoading = false;
+          _hasError = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _hasError = true;
+          _isLoading = false;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder(
-      stream: _eventsRef.onValue,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(
-            child: CircularProgressIndicator(color: Colors.greenAccent),
-          );
-        }
+    super.build(context);
+    
+    if (_isLoading) {
+      return const Center(
+        child: CircularProgressIndicator(color: Colors.greenAccent),
+      );
+    }
 
-        if (snapshot.hasError) {
-          return const Center(
-            child: Text(
-              "⚠️ Error loading upcoming events",
-              style: TextStyle(color: Colors.redAccent),
-            ),
-          );
-        }
+    if (_hasError) {
+      return const Center(
+        child: LiveTranslatedText(
+          "error_loading_upcoming_events",
+          style: TextStyle(color: Colors.redAccent),
+        ),
+      );
+    }
 
-        if (!snapshot.hasData || snapshot.data?.snapshot.value == null) {
-          return const Center(
-            child: Text(
-              "No upcoming events available.",
-              style: TextStyle(color: Colors.white70, fontSize: 16),
-            ),
-          );
-        }
+    if (_cachedEvents.isEmpty) {
+      return const Center(
+        child: LiveTranslatedText(
+          "no_upcoming_events",
+          style: TextStyle(color: Colors.white70),
+        ),
+      );
+    }
 
-        // Convert Firebase snapshot data
-        final data = Map<dynamic, dynamic>.from(
-            (snapshot.data! as DatabaseEvent).snapshot.value as Map);
-        final allEvents = data.entries.map((e) {
-          return Map<String, dynamic>.from(e.value);
-        }).toList();
-
-        // ✅ Filter: only events scheduled in the future
-        final now = DateTime.now();
-        final upcomingEvents = allEvents.where((event) {
-          if (event['eventDate'] == null) return false;
-          try {
-            final date = DateTime.parse(event['eventDate']);
-            return date.isAfter(now);
-          } catch (_) {
-            return false;
-          }
-        }).toList();
-
-        if (upcomingEvents.isEmpty) {
-          return const Center(
-            child: Text(
-              "📅 No upcoming events found.",
-              style: TextStyle(color: Colors.white70),
-            ),
-          );
-        }
-
-        return SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+    return SingleChildScrollView(
+      key: const ValueKey('upcoming_events_scroll'),
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
             children: [
               const Text(
-                "📅 Upcoming Events",
+                "📅 ",
                 style: TextStyle(
                   color: Colors.greenAccent,
                   fontSize: 22,
@@ -86,14 +127,21 @@ class _UpcomingEventsPageState extends State<UpcomingEventsPage> {
                   shadows: [Shadow(color: Colors.green, blurRadius: 2)],
                 ),
               ),
-              const SizedBox(height: 16),
-
-              // 🧾 Upcoming Event Cards
-              ...upcomingEvents.map((event) => _buildUpcomingEventCard(event)),
+              const LiveTranslatedText(
+                "upcoming_events",
+                style: TextStyle(
+                  color: Colors.greenAccent,
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  shadows: [Shadow(color: Colors.green, blurRadius: 2)],
+                ),
+              ),
             ],
           ),
-        );
-      },
+          const SizedBox(height: 16),
+          ..._cachedEvents.map((event) => _buildUpcomingEventCard(event)),
+        ],
+      ),
     );
   }
 
@@ -103,19 +151,19 @@ class _UpcomingEventsPageState extends State<UpcomingEventsPage> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => EventDetailsScreen(event: event),
+            builder: (context) => EventDetailsScreen(event: event, userKey: widget.userKey,),
           ),
         );
       },
       child: Container(
         margin: const EdgeInsets.only(bottom: 20),
         decoration: BoxDecoration(
-          color: Colors.black.withOpacity(0.8),
+          color: Colors.black.withValues(alpha: 0.8),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.greenAccent.withOpacity(0.4)),
+          border: Border.all(color: Colors.greenAccent.withValues(alpha: 0.4)),
           boxShadow: [
             BoxShadow(
-              color: Colors.greenAccent.withOpacity(0.2),
+              color: Colors.greenAccent.withValues(alpha: 0.2),
               blurRadius: 10,
               offset: const Offset(0, 5),
             ),
@@ -148,9 +196,9 @@ class _UpcomingEventsPageState extends State<UpcomingEventsPage> {
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [
-                          Colors.black.withOpacity(0.7),
+                          Colors.black.withValues(alpha: 0.7),
                           Colors.transparent,
-                          Colors.black.withOpacity(0.6),
+                          Colors.black.withValues(alpha: 0.6),
                         ],
                         begin: Alignment.bottomCenter,
                         end: Alignment.topCenter,
@@ -160,8 +208,8 @@ class _UpcomingEventsPageState extends State<UpcomingEventsPage> {
                   Positioned(
                     bottom: 12,
                     left: 16,
-                    child: Text(
-                      event["eventName"] ?? "Unnamed Event",
+                    child: DynamicTranslatedText(
+                      event["eventName"] ?? "unnamed_event".tr,
                       style: const TextStyle(
                         color: Colors.greenAccent,
                         fontSize: 18,
@@ -181,7 +229,7 @@ class _UpcomingEventsPageState extends State<UpcomingEventsPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   if (event["eventIntro"] != null)
-                    Text(
+                    DynamicTranslatedText(
                       event["eventIntro"],
                       style: const TextStyle(
                         color: Colors.white70,
@@ -197,8 +245,7 @@ class _UpcomingEventsPageState extends State<UpcomingEventsPage> {
                           size: 14, color: Colors.greenAccent),
                       const SizedBox(width: 6),
                       Text(
-                        event["eventDate"]?.substring(0, 10) ??
-                            "Unknown Date",
+                        MarathiUtils.formatDate(event["eventDate"]),
                         style: const TextStyle(
                           color: Colors.white70,
                           fontSize: 13,
@@ -209,8 +256,8 @@ class _UpcomingEventsPageState extends State<UpcomingEventsPage> {
                           size: 14, color: Colors.greenAccent),
                       const SizedBox(width: 6),
                       Expanded(
-                        child: Text(
-                          event["eventLocation"] ?? "Unknown Location",
+                        child: DynamicTranslatedText(
+                          event["eventLocation"] ?? "unknown_location".tr,
                           style: const TextStyle(
                             color: Colors.white70,
                             fontSize: 13,
@@ -230,8 +277,8 @@ class _UpcomingEventsPageState extends State<UpcomingEventsPage> {
                       ),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: const Text(
-                      "COMING SOON",
+                    child: const LiveTranslatedText(
+                      "coming_soon",
                       style: TextStyle(
                         color: Colors.black,
                         fontWeight: FontWeight.bold,

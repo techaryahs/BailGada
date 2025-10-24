@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../utils/translation_helper.dart';
 
 class DriverScreen extends StatelessWidget {
   const DriverScreen({super.key});
@@ -29,7 +30,7 @@ class DriverScreen extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.orange.withOpacity(0.1),
+                color: Colors.orange.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: Colors.orange, width: 1),
               ),
@@ -78,8 +79,8 @@ class DriverScreen extends StatelessWidget {
                   title: "My Races",
                   onTap: () {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text("My Races clicked!"),
+                      SnackBar(
+                        content: Text("my_races_clicked".tr),
                         backgroundColor: Colors.orange,
                       ),
                     );
@@ -121,25 +122,25 @@ class DriverScreen extends StatelessWidget {
 
             _buildStatsCard(
               icon: Icons.star,
-              label: "Total Races Completed",
+              label: "total_races_completed".tr,
               value: "28",
             ),
             const SizedBox(height: 12),
             _buildStatsCard(
               icon: Icons.emoji_events,
-              label: "Races Won",
+              label: "races_won".tr,
               value: "11",
             ),
             const SizedBox(height: 12),
             _buildStatsCard(
               icon: Icons.speed,
-              label: "Average Speed",
+              label: "average_speed".tr,
               value: "65 km/h",
             ),
             const SizedBox(height: 12),
             _buildStatsCard(
               icon: Icons.attach_money,
-              label: "Total Earnings",
+              label: "total_earnings".tr,
               value: "₹1.5L",
             ),
           ],
@@ -159,7 +160,7 @@ class DriverScreen extends StatelessWidget {
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.orange.withOpacity(0.1),
+          color: Colors.orange.withValues(alpha: 0.1),
           border: Border.all(color: Colors.orange, width: 1),
           borderRadius: BorderRadius.circular(12),
         ),

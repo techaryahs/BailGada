@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
-import 'package:intl/intl.dart';
+import '../../utils/translation_helper.dart';
+import '../../utils/marathi_utils.dart';
 
 class HostDashboardScreen extends StatelessWidget {
-  const HostDashboardScreen({Key? key}) : super(key: key);
+  const HostDashboardScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -20,9 +21,9 @@ class HostDashboardScreen extends StatelessWidget {
               // 🏁 Header
               FadeInDown(
                 duration: const Duration(milliseconds: 700),
-                child: const Text(
-                  '🏁 Bailgada Host Dashboard',
-                  style: TextStyle(
+                child: Text(
+                  '🏁 ${"bailgada_host_dashboard".tr}',
+                  style: const TextStyle(
                     fontSize: 26,
                     fontWeight: FontWeight.bold,
                     color: Colors.black87,
@@ -34,7 +35,7 @@ class HostDashboardScreen extends StatelessWidget {
               FadeIn(
                 duration: const Duration(milliseconds: 900),
                 child: Text(
-                  'Welcome back, Shivaji! Manage your races, participants & sponsors efficiently.',
+                  'welcome_back_host'.tr,
                   style: TextStyle(
                     color: Colors.grey.shade600,
                     fontSize: 15,
@@ -55,29 +56,33 @@ class HostDashboardScreen extends StatelessWidget {
                   childAspectRatio: size.width > 600 ? 1.5 : 1,
                   children: [
                     _buildDashboardCard(
+                      context,
                       icon: Icons.event_available,
-                      title: 'Total Events',
+                      titleKey: 'total_events',
                       value: '12',
                       color1: const Color(0xFFFFB74D),
                       color2: const Color(0xFFFF9800),
                     ),
                     _buildDashboardCard(
+                      context,
                       icon: Icons.pending_actions,
-                      title: 'Pending Approvals',
+                      titleKey: 'pending_approvals',
                       value: '3',
                       color1: const Color(0xFFFFD54F),
                       color2: const Color(0xFFFFB300),
                     ),
                     _buildDashboardCard(
+                      context,
                       icon: Icons.people_alt_rounded,
-                      title: 'Participants',
+                      titleKey: 'participants',
                       value: '248',
                       color1: const Color(0xFFFFAB91),
                       color2: const Color(0xFFFF7043),
                     ),
                     _buildDashboardCard(
+                      context,
                       icon: Icons.flag_circle_rounded,
-                      title: 'Upcoming Races',
+                      titleKey: 'upcoming_races',
                       value: '5',
                       color1: const Color(0xFFFFCC80),
                       color2: const Color(0xFFFFB74D),
@@ -98,7 +103,7 @@ class HostDashboardScreen extends StatelessWidget {
                     border: Border.all(color: Colors.orangeAccent.shade100),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.orangeAccent.withOpacity(0.2),
+                        color: Colors.orangeAccent.withValues(alpha: 0.2),
                         blurRadius: 10,
                         offset: const Offset(0, 6),
                       ),
@@ -113,9 +118,9 @@ class HostDashboardScreen extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
-                              "Next Big Event 🔥",
-                              style: TextStyle(
+                            Text(
+                              "${"next_big_event".tr} 🔥",
+                              style: const TextStyle(
                                 color: Colors.black87,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 18,
@@ -123,7 +128,7 @@ class HostDashboardScreen extends StatelessWidget {
                             ),
                             const SizedBox(height: 6),
                             Text(
-                              "Kolhapur Bull Power Challenge - ${DateFormat('d MMM yyyy').format(DateTime.now().add(const Duration(days: 7)))}",
+                              "${'kolhapur_bull_power'.tr} - ${MarathiUtils.formatDate(DateTime.now().add(const Duration(days: 7)).toIso8601String())}",
                               style: TextStyle(
                                 color: Colors.grey.shade700,
                                 fontSize: 14,
@@ -141,9 +146,9 @@ class HostDashboardScreen extends StatelessWidget {
               // 🕓 Recent Activities
               FadeInUp(
                 duration: const Duration(milliseconds: 800),
-                child: const Text(
-                  "Recent Activities",
-                  style: TextStyle(
+                child: Text(
+                  "recent_activities".tr,
+                  style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                     color: Colors.black87,
@@ -153,23 +158,23 @@ class HostDashboardScreen extends StatelessWidget {
               const SizedBox(height: 16),
               _buildActivityTile(
                 Icons.add_circle,
-                "New Event Created: Pune Championship 2025",
-                "2 hours ago",
+                "new_event_created".tr,
+                "2 ${'hours_ago'.tr}",
               ),
               _buildActivityTile(
                 Icons.person_add_alt_1,
-                "New Participant Registered",
-                "5 hours ago",
+                "new_participant_registered".tr,
+                "5 ${'hours_ago'.tr}",
               ),
               _buildActivityTile(
                 Icons.monetization_on_rounded,
-                "Sponsor Added: Maharashtra Tourism",
-                "1 day ago",
+                "sponsor_added".tr,
+                "1 ${'day_ago'.tr}",
               ),
               _buildActivityTile(
                 Icons.verified,
-                "Event Approved: Sangli Rural Fest",
-                "2 days ago",
+                "event_approved".tr,
+                "2 ${'days_ago'.tr}",
               ),
               const SizedBox(height: 40),
 
@@ -184,12 +189,11 @@ class HostDashboardScreen extends StatelessWidget {
                     color: Colors.orange.shade50,
                     borderRadius: BorderRadius.circular(16),
                     border:
-                    Border.all(color: Colors.orangeAccent.withOpacity(0.3)),
+                    Border.all(color: Colors.orangeAccent.withValues(alpha: 0.3)),
                   ),
                   child: Column(
                     children: [
-                      const Text(
-                        "“The power of your bulls defines the glory of your race.”",
+                      Text("bulls_glory_quote".tr,
                         style: TextStyle(
                           color: Colors.orange,
                           fontSize: 16,
@@ -200,7 +204,7 @@ class HostDashboardScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 10),
                       Text(
-                        "- Bailgada Sharyat Team",
+                        "bailgada_team".tr,
                         style: TextStyle(
                           color: Colors.grey.shade600,
                           fontSize: 13,
@@ -218,9 +222,10 @@ class HostDashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildDashboardCard({
+  Widget _buildDashboardCard(
+    BuildContext context, {
     required IconData icon,
-    required String title,
+    required String titleKey,
     required String value,
     required Color color1,
     required Color color2,
@@ -235,7 +240,7 @@ class HostDashboardScreen extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: color2.withOpacity(0.3),
+            color: color2.withValues(alpha: 0.3),
             blurRadius: 10,
             offset: const Offset(0, 6),
           )
@@ -247,7 +252,7 @@ class HostDashboardScreen extends StatelessWidget {
           Icon(icon, size: 34, color: Colors.white),
           const SizedBox(height: 6),
           Text(
-            value,
+            MarathiUtils.convertToMarathiNumber(value),
             style: const TextStyle(
               color: Colors.white,
               fontSize: 22,
@@ -256,12 +261,13 @@ class HostDashboardScreen extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            title,
+            titleKey.tr,
             style: const TextStyle(
               color: Colors.white70,
               fontSize: 14,
               fontWeight: FontWeight.w500,
             ),
+            textAlign: TextAlign.center,
           ),
         ],
       ),
@@ -276,7 +282,7 @@ class HostDashboardScreen extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.orangeAccent.withOpacity(0.3)),
+          border: Border.all(color: Colors.orangeAccent.withValues(alpha: 0.3)),
           boxShadow: [
             BoxShadow(
               color: Colors.grey.shade200,
@@ -287,7 +293,7 @@ class HostDashboardScreen extends StatelessWidget {
         ),
         child: ListTile(
           leading: CircleAvatar(
-            backgroundColor: Colors.orangeAccent.withOpacity(0.9),
+            backgroundColor: Colors.orangeAccent.withValues(alpha: 0.9),
             child: Icon(icon, color: Colors.white, size: 20),
           ),
           title: Text(

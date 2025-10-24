@@ -2,6 +2,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import '../utils/translation_helper.dart';
 
 class MyBailOxPage extends StatefulWidget {
   const MyBailOxPage({super.key});
@@ -26,9 +27,11 @@ class _MyBailOxPageState extends State<MyBailOxPage> {
       appBar: AppBar(
         backgroundColor: Colors.deepOrangeAccent,
         centerTitle: true,
-        title: const Text(
-          "My Bail (OX)",
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+        title: TranslationBuilder(
+          builder: (context) => Text(
+            'my_bail_ox'.tr,
+            style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+          ),
         ),
       ),
       body: oxList.isEmpty ? _emptyState() : _oxListView(),
@@ -38,14 +41,16 @@ class _MyBailOxPageState extends State<MyBailOxPage> {
   }
 
   Widget _emptyState() {
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: const [
-          Icon(Icons.pets, color: Colors.white38, size: 64),
-          SizedBox(height: 12),
-          Text("No OX added yet", style: TextStyle(color: Colors.white70)),
-        ],
+    return TranslationBuilder(
+      builder: (context) => Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.pets, color: Colors.white38, size: 64),
+            const SizedBox(height: 12),
+            Text('no_ox_added_yet'.tr, style: const TextStyle(color: Colors.white70)),
+          ],
+        ),
       ),
     );
   }
@@ -59,12 +64,12 @@ class _MyBailOxPageState extends State<MyBailOxPage> {
         return Container(
           margin: const EdgeInsets.only(bottom: 16),
           decoration: BoxDecoration(
-            color: Colors.black.withOpacity(0.75),
+            color: Colors.black.withValues(alpha: 0.75),
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: Colors.deepOrangeAccent.withOpacity(0.25)),
+            border: Border.all(color: Colors.deepOrangeAccent.withValues(alpha: 0.25)),
             boxShadow: [
               BoxShadow(
-                color: Colors.deepOrangeAccent.withOpacity(0.12),
+                color: Colors.deepOrangeAccent.withValues(alpha: 0.12),
                 blurRadius: 8,
                 offset: const Offset(0, 3),
               ),
@@ -92,12 +97,14 @@ class _MyBailOxPageState extends State<MyBailOxPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        ox["name"] ?? "Unnamed OX",
-                        style: const TextStyle(
-                          color: Colors.orangeAccent,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
+                      TranslationBuilder(
+                        builder: (context) => Text(
+                          ox["name"] ?? 'unnamed_ox'.tr,
+                          style: const TextStyle(
+                            color: Colors.orangeAccent,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -159,11 +166,11 @@ class _MyBailOxPageState extends State<MyBailOxPage> {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: isPair
-              ? [Colors.deepOrangeAccent.withOpacity(0.2), Colors.orange.withOpacity(0.15)]
-              : [Colors.orange.withOpacity(0.12), Colors.deepOrangeAccent.withOpacity(0.08)],
+              ? [Colors.deepOrangeAccent.withValues(alpha: 0.2), Colors.orange.withValues(alpha: 0.15)]
+              : [Colors.orange.withValues(alpha: 0.12), Colors.deepOrangeAccent.withValues(alpha: 0.08)],
         ),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.orangeAccent.withOpacity(0.25)),
+        border: Border.all(color: Colors.orangeAccent.withValues(alpha: 0.25)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -200,14 +207,23 @@ class _MyBailOxPageState extends State<MyBailOxPage> {
         decoration: BoxDecoration(
           gradient: const LinearGradient(colors: [Color(0xFFFF6E40), Color(0xFFFF3D00)]),
           borderRadius: BorderRadius.circular(30),
-          boxShadow: [BoxShadow(color: Colors.deepOrangeAccent.withOpacity(0.5), blurRadius: 10, offset: const Offset(0, 4))],
+          boxShadow: [BoxShadow(color: Colors.deepOrangeAccent.withValues(alpha: 0.5), blurRadius: 10, offset: const Offset(0, 4))],
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
-          children: const [
-            Icon(Icons.add_circle_outline, color: Colors.white, size: 22),
-            SizedBox(width: 8),
-            Text("Add OX", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          children: [
+            const Icon(Icons.add_circle_outline, color: Colors.white, size: 22),
+            const SizedBox(width: 8),
+            Flexible(
+              child: TranslationBuilder(
+                builder: (context) => Text(
+                  'add_ox'.tr, 
+                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ),
           ],
         ),
       ),
@@ -252,12 +268,12 @@ class _AddOxFormPageState extends State<AddOxFormPage> {
     if (!_formKey.currentState!.validate()) return;
 
     if (_selectedType == "Single" && _ox1Image == null) {
-      _showSnack("Please add OX photo");
+      _showSnack('please_add_ox_photo'.tr);
       return;
     }
 
     if (_selectedType == "Pair" && (_ox1Image == null || _ox2Image == null)) {
-      _showSnack("Please add both OX photos");
+      _showSnack('please_add_both_ox_photos'.tr);
       return;
     }
 
@@ -287,9 +303,11 @@ class _AddOxFormPageState extends State<AddOxFormPage> {
       backgroundColor: Colors.black,
       appBar: AppBar(
         backgroundColor: Colors.deepOrangeAccent,
-        title: const Text(
-          "Add OX",
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+        title: TranslationBuilder(
+          builder: (context) => Text(
+            'add_ox'.tr,
+            style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+          ),
         ),
         centerTitle: true,
       ),
@@ -301,20 +319,20 @@ class _AddOxFormPageState extends State<AddOxFormPage> {
             children: [
               // 🔸 Type Dropdown
               DropdownButtonFormField<String>(
-                value: _selectedType,
+                initialValue: _selectedType,
                 dropdownColor: Colors.black,
                 style: const TextStyle(color: Colors.white, fontSize: 16),
                 icon: const Icon(Icons.arrow_drop_down, color: Colors.orangeAccent),
-                items: const [
-                  DropdownMenuItem(value: "Single", child: Text("Single", style: TextStyle(color: Colors.white))),
-                  DropdownMenuItem(value: "Pair", child: Text("Pair", style: TextStyle(color: Colors.white))),
+                items: [
+                  DropdownMenuItem(value: "Single", child: TranslationBuilder(builder: (context) => Text('single'.tr, style: const TextStyle(color: Colors.white)))),
+                  DropdownMenuItem(value: "Pair", child: TranslationBuilder(builder: (context) => Text('pair'.tr, style: const TextStyle(color: Colors.white)))),
                 ],
                 onChanged: (v) => setState(() => _selectedType = v ?? "Single"),
                 decoration: InputDecoration(
-                  labelText: "Select Type",
+                  labelText: 'select_type'.tr,
                   labelStyle: const TextStyle(color: Colors.orangeAccent),
                   enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.orangeAccent.withOpacity(0.5)),
+                    borderSide: BorderSide(color: Colors.orangeAccent.withValues(alpha: 0.5)),
                   ),
                   focusedBorder: const OutlineInputBorder(
                     borderSide: BorderSide(color: Colors.orangeAccent),
@@ -335,16 +353,18 @@ class _AddOxFormPageState extends State<AddOxFormPage> {
               const SizedBox(height: 30),
 
               // ✅ Save Button
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.deepOrangeAccent,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                ),
-                onPressed: _submit,
-                child: const Text(
-                  "Save OX",
-                  style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+              TranslationBuilder(
+                builder: (context) => ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.deepOrangeAccent,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                  onPressed: _submit,
+                  child: Text(
+                    'save_ox'.tr,
+                    style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+                  ),
                 ),
               ),
             ],
@@ -355,84 +375,88 @@ class _AddOxFormPageState extends State<AddOxFormPage> {
   }
 
   Widget _buildSingleOxSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          "OX Details",
-          style: TextStyle(color: Colors.orangeAccent, fontSize: 18, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 10),
-        TextFormField(
-          controller: _ox1NameCtrl,
-          style: const TextStyle(color: Colors.white),
-          decoration: InputDecoration(
-            labelText: "OX Name",
-            labelStyle: const TextStyle(color: Colors.orangeAccent),
-            enabledBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: Colors.orangeAccent.withOpacity(0.5)),
-            ),
-            focusedBorder: const OutlineInputBorder(
-              borderSide: BorderSide(color: Colors.orangeAccent),
-            ),
-            hintText: "e.g. Ganesh",
-            hintStyle: const TextStyle(color: Colors.white30),
+    return TranslationBuilder(
+      builder: (context) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'ox_details'.tr,
+            style: const TextStyle(color: Colors.orangeAccent, fontSize: 18, fontWeight: FontWeight.bold),
           ),
-          validator: (v) => v == null || v.trim().isEmpty ? "Enter OX name" : null,
-        ),
-        const SizedBox(height: 16),
-        _imagePickerTile("OX Photo", _ox1Image, () => _pickImage(true)),
-      ],
+          const SizedBox(height: 10),
+          TextFormField(
+            controller: _ox1NameCtrl,
+            style: const TextStyle(color: Colors.white),
+            decoration: InputDecoration(
+              labelText: 'ox_name'.tr,
+              labelStyle: const TextStyle(color: Colors.orangeAccent),
+              enabledBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.orangeAccent.withValues(alpha: 0.5)),
+              ),
+              focusedBorder: const OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.orangeAccent),
+              ),
+              hintText: "e.g. Ganesh",
+              hintStyle: const TextStyle(color: Colors.white30),
+            ),
+            validator: (v) => v == null || v.trim().isEmpty ? 'enter_ox_name'.tr : null,
+          ),
+          const SizedBox(height: 16),
+          _imagePickerTile('ox_photo'.tr, _ox1Image, () => _pickImage(true)),
+        ],
+      ),
     );
   }
 
   Widget _buildPairOxSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          "OX Pair Details",
-          style: TextStyle(color: Colors.orangeAccent, fontSize: 18, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 10),
-        TextFormField(
-          controller: _ox1NameCtrl,
-          style: const TextStyle(color: Colors.white),
-          decoration: InputDecoration(
-            labelText: "First OX Name",
-            labelStyle: const TextStyle(color: Colors.orangeAccent),
-            enabledBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: Colors.orangeAccent.withOpacity(0.5)),
-            ),
-            focusedBorder: const OutlineInputBorder(
-              borderSide: BorderSide(color: Colors.orangeAccent),
-            ),
+    return TranslationBuilder(
+      builder: (context) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'ox_pair_details'.tr,
+            style: const TextStyle(color: Colors.orangeAccent, fontSize: 18, fontWeight: FontWeight.bold),
           ),
-          validator: (v) => v == null || v.trim().isEmpty ? "Enter first OX name" : null,
-        ),
-        const SizedBox(height: 16),
-        _imagePickerTile("First OX Photo", _ox1Image, () => _pickImage(true)),
-
-        const SizedBox(height: 24),
-
-        TextFormField(
-          controller: _ox2NameCtrl,
-          style: const TextStyle(color: Colors.white),
-          decoration: InputDecoration(
-            labelText: "Second OX Name",
-            labelStyle: const TextStyle(color: Colors.orangeAccent),
-            enabledBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: Colors.orangeAccent.withOpacity(0.5)),
+          const SizedBox(height: 10),
+          TextFormField(
+            controller: _ox1NameCtrl,
+            style: const TextStyle(color: Colors.white),
+            decoration: InputDecoration(
+              labelText: 'first_ox_name'.tr,
+              labelStyle: const TextStyle(color: Colors.orangeAccent),
+              enabledBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.orangeAccent.withValues(alpha: 0.5)),
+              ),
+              focusedBorder: const OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.orangeAccent),
+              ),
             ),
-            focusedBorder: const OutlineInputBorder(
-              borderSide: BorderSide(color: Colors.orangeAccent),
-            ),
+            validator: (v) => v == null || v.trim().isEmpty ? 'enter_first_ox_name'.tr : null,
           ),
-          validator: (v) => v == null || v.trim().isEmpty ? "Enter second OX name" : null,
-        ),
-        const SizedBox(height: 16),
-        _imagePickerTile("Second OX Photo", _ox2Image, () => _pickImage(false)),
-      ],
+          const SizedBox(height: 16),
+          _imagePickerTile('first_ox_photo'.tr, _ox1Image, () => _pickImage(true)),
+
+          const SizedBox(height: 24),
+
+          TextFormField(
+            controller: _ox2NameCtrl,
+            style: const TextStyle(color: Colors.white),
+            decoration: InputDecoration(
+              labelText: 'second_ox_name'.tr,
+              labelStyle: const TextStyle(color: Colors.orangeAccent),
+              enabledBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.orangeAccent.withValues(alpha: 0.5)),
+              ),
+              focusedBorder: const OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.orangeAccent),
+              ),
+            ),
+            validator: (v) => v == null || v.trim().isEmpty ? 'enter_second_ox_name'.tr : null,
+          ),
+          const SizedBox(height: 16),
+          _imagePickerTile('second_ox_photo'.tr, _ox2Image, () => _pickImage(false)),
+        ],
+      ),
     );
   }
 
@@ -445,7 +469,7 @@ class _AddOxFormPageState extends State<AddOxFormPage> {
         decoration: BoxDecoration(
           color: Colors.black54,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.deepOrangeAccent.withOpacity(0.6)),
+          border: Border.all(color: Colors.deepOrangeAccent.withValues(alpha: 0.6)),
         ),
         child: imageFile == null
             ? Column(
@@ -453,9 +477,11 @@ class _AddOxFormPageState extends State<AddOxFormPage> {
           children: [
             const Icon(Icons.add_a_photo, color: Colors.orangeAccent, size: 40),
             const SizedBox(height: 10),
-            Text(
-              "Tap to add $label",
-              style: const TextStyle(color: Colors.white70),
+            TranslationBuilder(
+              builder: (context) => Text(
+                "${'tap_to_add'.tr} $label",
+                style: const TextStyle(color: Colors.white70),
+              ),
             ),
           ],
         )

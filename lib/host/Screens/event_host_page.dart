@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import '../models/racer_data.dart';
-import '../../widgets/racer_details_widget.dart';
+import '../../utils/translation_helper.dart';
 
 class EventHostPage extends StatefulWidget {
-  const EventHostPage({Key? key}) : super(key: key);
+  const EventHostPage({super.key});
 
   @override
   State<EventHostPage> createState() => _EventHostPageState();
@@ -127,19 +127,23 @@ class _EventHostPageState extends State<EventHostPage> {
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
-                        Text(
-                          'Bailgada Race - Championship 2025',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF2C3E50),
+                      children: [
+                        TranslationBuilder(
+                          builder: (context) => Text(
+                            'bailgada_race_championship'.tr,
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF2C3E50),
+                            ),
                           ),
                         ),
-                        SizedBox(height: 4),
-                        Text(
-                          'Live from Kundapura, Karnataka',
-                          style: TextStyle(fontSize: 13, color: Colors.grey),
+                        const SizedBox(height: 4),
+                        TranslationBuilder(
+                          builder: (context) => Text(
+                            'live_from_location'.tr,
+                            style: const TextStyle(fontSize: 13, color: Colors.grey),
+                          ),
                         ),
                       ],
                     ),
@@ -159,12 +163,14 @@ class _EventHostPageState extends State<EventHostPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     /// ⚪ ROUNDS SECTION
-                    const Text(
-                      'Rounds',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF2C3E50),
+                    TranslationBuilder(
+                      builder: (context) => Text(
+                        'rounds'.tr,
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF2C3E50),
+                        ),
                       ),
                     ),
                     const SizedBox(height: 10),
@@ -195,7 +201,7 @@ class _EventHostPageState extends State<EventHostPage> {
                                   begin: Alignment.centerLeft,
                                   end: Alignment.centerRight,
                                   colors: [
-                                    Colors.white.withOpacity(0),
+                                    Colors.white.withValues(alpha: 0),
                                     Colors.white,
                                   ],
                                 ),
@@ -213,7 +219,7 @@ class _EventHostPageState extends State<EventHostPage> {
                                     borderRadius: BorderRadius.circular(10),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: const Color(0xFFFF6B35).withOpacity(0.5),
+                                        color: const Color(0xFFFF6B35).withValues(alpha: 0.5),
                                         blurRadius: 10,
                                         spreadRadius: 2,
                                         offset: const Offset(-3, 2), // 👈 pushes shadow slightly left & down
@@ -221,13 +227,15 @@ class _EventHostPageState extends State<EventHostPage> {
                                     ],
 
                                   ),
-                                  child: const Center(
-                                    child: Text(
-                                      'ALL',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 15,
+                                  child: TranslationBuilder(
+                                    builder: (context) => Center(
+                                      child: Text(
+                                        'all'.tr,
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 15,
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -295,12 +303,12 @@ class _EventHostPageState extends State<EventHostPage> {
           border: Border.all(
             color: isSelected
                 ? const Color(0xFFFF6B35)
-                : Colors.grey.withOpacity(0.4),
+                : Colors.grey.withValues(alpha: 0.4),
           ),
           boxShadow: [
             if (isSelected)
               BoxShadow(
-                color: const Color(0xFFFF6B35).withOpacity(0.2),
+                color: const Color(0xFFFF6B35).withValues(alpha: 0.2),
                 blurRadius: 6,
                 offset: const Offset(0, 3),
               ),
@@ -326,12 +334,14 @@ class _EventHostPageState extends State<EventHostPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Race Slots',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: Color(0xFF2C3E50),
+        TranslationBuilder(
+          builder: (context) => Text(
+            'race_slots'.tr,
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF2C3E50),
+            ),
           ),
         ),
         const SizedBox(height: 12),
@@ -365,13 +375,13 @@ class _EventHostPageState extends State<EventHostPage> {
                   border: Border.all(
                     color: isSelected
                         ? const Color(0xFFFF6B35)
-                        : Colors.grey.withOpacity(0.4),
+                        : Colors.grey.withValues(alpha: 0.4),
                     width: 1.5,
                   ),
                   boxShadow: [
                     if (isSelected)
                       BoxShadow(
-                        color: const Color(0xFFFF6B35).withOpacity(0.3),
+                        color: const Color(0xFFFF6B35).withValues(alpha: 0.3),
                         blurRadius: 6,
                         offset: const Offset(0, 3),
                       ),
@@ -405,11 +415,13 @@ class _EventHostPageState extends State<EventHostPage> {
 
   Widget _buildParticipantsSection(List<Participant> participants) {
     if (participants.isEmpty) {
-      return const Padding(
-        padding: EdgeInsets.only(top: 10),
-        child: Text(
-          "No participants available for this slot.",
-          style: TextStyle(color: Colors.grey),
+      return TranslationBuilder(
+        builder: (context) => Padding(
+          padding: const EdgeInsets.only(top: 10),
+          child: Text(
+            'no_participants_available'.tr,
+            style: const TextStyle(color: Colors.grey),
+          ),
         ),
       );
     }
@@ -417,12 +429,14 @@ class _EventHostPageState extends State<EventHostPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          "Participants",
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: Color(0xFF2C3E50),
+        TranslationBuilder(
+          builder: (context) => Text(
+            'participants'.tr,
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF2C3E50),
+            ),
           ),
         ),
         const SizedBox(height: 10),
@@ -436,12 +450,12 @@ class _EventHostPageState extends State<EventHostPage> {
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                  color: const Color(0xFFFF6B35).withOpacity(0.3),
+                  color: const Color(0xFFFF6B35).withValues(alpha: 0.3),
                   width: 1.2,
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFFFF6B35).withOpacity(0.1),
+                    color: const Color(0xFFFF6B35).withValues(alpha: 0.1),
                     blurRadius: 5,
                     offset: const Offset(0, 3),
                   ),
@@ -472,12 +486,14 @@ class _EventHostPageState extends State<EventHostPage> {
                         children: [
                           const Icon(Icons.flag, size: 16, color: Color(0xFFFF6B35)),
                           const SizedBox(width: 5),
-                          Text(
-                            "Track ${p.trackNumber}",
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: Colors.grey[700],
-                              fontWeight: FontWeight.w500,
+                          TranslationBuilder(
+                            builder: (context) => Text(
+                              "${'track'.tr} ${p.trackNumber}",
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: Colors.grey[700],
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
                           ),
                         ],
@@ -526,13 +542,13 @@ class _EventHostPageState extends State<EventHostPage> {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            const Color(0xFFFF6B35).withOpacity(0.06),
-            const Color(0xFFFF8C42).withOpacity(0.06),
+            const Color(0xFFFF6B35).withValues(alpha: 0.06),
+            const Color(0xFFFF8C42).withValues(alpha: 0.06),
           ],
         ),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: const Color(0xFFFF6B35).withOpacity(0.3),
+          color: const Color(0xFFFF6B35).withValues(alpha: 0.3),
           width: 1.2,
         ),
       ),
@@ -546,7 +562,7 @@ class _EventHostPageState extends State<EventHostPage> {
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: const Color(0xFFFF6B35).withOpacity(0.2),
+                  color: const Color(0xFFFF6B35).withValues(alpha: 0.2),
                   blurRadius: 8,
                   offset: const Offset(0, 4),
                 ),
@@ -559,22 +575,26 @@ class _EventHostPageState extends State<EventHostPage> {
             ),
           ),
           const SizedBox(height: 12),
-          const Text(
-            'Slots Yet to be Declared',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFFFF6B35),
+          TranslationBuilder(
+            builder: (context) => Text(
+              'slots_yet_to_be_declared'.tr,
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFFFF6B35),
+              ),
             ),
           ),
           const SizedBox(height: 6),
-          const Text(
-            'Stay tuned for the next exciting round!',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 13,
-              color: Colors.grey,
-              fontWeight: FontWeight.w500,
+          TranslationBuilder(
+            builder: (context) => Text(
+              'stay_tuned_next_round'.tr,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 13,
+                color: Colors.grey,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ),
         ],

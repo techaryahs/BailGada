@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../services/translation_service.dart';
 
 class BottomNavBar extends StatelessWidget {
   final int selectedIndex;
@@ -12,6 +13,8 @@ class BottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final translationService = TranslationService();
+    
     return Container(
       decoration: const BoxDecoration(
         color: Colors.black,
@@ -30,16 +33,16 @@ class BottomNavBar extends StatelessWidget {
         unselectedItemColor: Colors.white70,
         currentIndex: selectedIndex,
         onTap: onTap,
-        items: const [
+        items: [
           BottomNavigationBarItem(
-            icon: Icon(Icons.home_outlined),
-            activeIcon: Icon(Icons.home),
-            label: "Home",
+            icon: const Icon(Icons.home_outlined),
+            activeIcon: const Icon(Icons.home),
+            label: translationService.translate("home"),
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.person_outline),
-            activeIcon: Icon(Icons.person),
-            label: "Profile",
+            icon: const Icon(Icons.person_outline),
+            activeIcon: const Icon(Icons.person),
+            label: translationService.translate("profile"),
           ),
         ],
       ),

@@ -1,22 +1,60 @@
-import 'package:bailgada/host/Screens/addEventScreen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_database/firebase_database.dart';
-import 'Splashscreen/SplashScreen.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'Splashscreen/splash_screen.dart';
 import 'firebase_options.dart';
-import 'host/Screens/event_creation_page.dart';
-import 'host/Screens/host_screen.dart';
+import 'services/translation_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(const MyApp());
+  final String userKey;
+  final translationService = TranslationService();
+  await translationService.initialize();
+  await translationService.loadLanguagePreference();
+  
+  runApp(MyApp(translationService: translationService, userKey: "",));
+  
+  // Preload all supported languages in background
+  Future.microtask(() async {
+    for (var lang in TranslationService.supportedLanguages) {
+      if (lang != 'en') {
+        await translationService.preloadLanguage(lang, forceRefresh: false);
+      }
+    }
+  });
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class MyApp extends StatefulWidget {
+  final TranslationService translationService;
+  final String userKey;
+
+  const MyApp({super.key, required this.translationService, required this.userKey});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  @override
+  void initState() {
+    super.initState();
+    widget.translationService.addListener(_onLanguageChanged);
+  }
+
+  @override
+  void dispose() {
+    widget.translationService.removeListener(_onLanguageChanged);
+    super.dispose();
+  }
+
+  void _onLanguageChanged() {
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,36 +62,30 @@ class MyApp extends StatelessWidget {
       title: 'BailGada App',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepOrange),
+        textTheme: GoogleFonts.notoSansDevanagariTextTheme(
+          Theme.of(context).textTheme,
+        ),
+        fontFamily: GoogleFonts.notoSansDevanagari().fontFamily,
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Colors.deepOrangeAccent,
+          foregroundColor: Colors.black,
+          elevation: 0,
+        ),
       ),
-      home: const SplashScreen(),
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('mr', ''),
+        Locale('en', ''),
+      ],
+      locale: Locale(widget.translationService.currentLanguage),
+      home: SplashScreen(userKey: widget.userKey,),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
 
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  final DatabaseReference _dbRef =
-  FirebaseDatabase.instance.ref().child("test/boolean");
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Text("Main File")
-      ),
-    );
-  }
-}

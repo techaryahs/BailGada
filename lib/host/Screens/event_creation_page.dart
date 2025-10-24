@@ -3,9 +3,13 @@ import 'package:firebase_database/firebase_database.dart';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import '../../utils/translation_helper.dart';
+import '../../widgets/live_translated_text.dart';
+import '../../utils/marathi_utils.dart';
+import '../../services/translation_service.dart';
 
 class EventCreationPage extends StatefulWidget {
-  const EventCreationPage({Key? key}) : super(key: key);
+  const EventCreationPage({super.key});
 
   @override
   State<EventCreationPage> createState() => _EventCreationPageState();
@@ -70,18 +74,49 @@ class _EventCreationPageState extends State<EventCreationPage> {
       _formKey.currentState!.save();
 
       try {
+        // Show loading
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => const Center(
+            child: CircularProgressIndicator(color: Colors.orange),
+          ),
+        );
+
+        // Pre-translate event content
+        final translationService = TranslationService();
+        String? eventNameMr;
+        String? eventIntroMr;
+        String? eventLocationMr;
+
+        if (eventName != null) {
+          eventNameMr = await translationService.translateDynamicText(eventName!);
+        }
+        if (eventIntro != null) {
+          eventIntroMr = await translationService.translateDynamicText(eventIntro!);
+        }
+        if (eventLocation != null) {
+          eventLocationMr = await translationService.translateDynamicText(eventLocation!);
+        }
+
+        // Close loading dialog
+        if (mounted) Navigator.pop(context);
+
         final dbRef = FirebaseDatabase.instance.ref().child('events').push();
         String hostKey = dbRef.key!;
 
         await dbRef.set({
           'hostKey': hostKey,
           'eventName': eventName,
+          'eventName_mr': eventNameMr,
           'eventIntro': eventIntro,
+          'eventIntro_mr': eventIntroMr,
           'eventVideoUrl': _videoType == 'url' ? _videoUrlController.text : null,
           'eventVideoPath': _eventVideoFile?.path,
           'eventBannerPath': _bannerImage?.path,
-          'approvalCertificatePath': _approvalCertificate?.path, // ✅ Added
+          'approvalCertificatePath': _approvalCertificate?.path,
           'eventLocation': eventLocation,
+          'eventLocation_mr': eventLocationMr,
           'eventDate': DateFormat('yyyy-MM-dd').format(eventDate!),
           'eventTime': eventTime?.format(context),
           'totalParticipants': totalParticipants,
@@ -92,15 +127,19 @@ class _EventCreationPageState extends State<EventCreationPage> {
           'createdAt': DateTime.now().toIso8601String(),
         });
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('✅ Event successfully created!')),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('event_created_success'.tr)),
+          );
 
-        Navigator.pop(context);
+          Navigator.pop(context);
+        }
       } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('❌ Failed to save event: $e')),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('${'failed_to_save_event'.tr}: $e')),
+          );
+        }
       }
     }
   }
@@ -109,7 +148,7 @@ class _EventCreationPageState extends State<EventCreationPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Create New Event'),
+        title: LiveTranslatedText('create_new_event'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
@@ -131,18 +170,18 @@ class _EventCreationPageState extends State<EventCreationPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildSectionHeader('🐂 Event Information'),
+              _buildSectionHeader('🐂 ${'event_information'.tr}'),
               _buildCard([
                 _buildTextField(
-                  label: 'Event Name *',
-                  hint: 'Enter event name',
+                  label: 'event_name_required'.tr,
+                  hint: 'enter_event_name'.tr,
                   onSaved: (value) => eventName = value,
-                  validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+                  validator: (value) => value?.isEmpty ?? true ? 'required'.tr : null,
                 ),
                 const SizedBox(height: 16),
                 _buildTextField(
-                  label: 'Event Intro (Optional)',
-                  hint: 'Brief description of the event',
+                  label: 'event_intro'.tr,
+                  hint: 'event_description'.tr,
                   maxLines: 3,
                   onSaved: (value) => eventIntro = value,
                 ),
@@ -158,7 +197,7 @@ class _EventCreationPageState extends State<EventCreationPage> {
                           child: ElevatedButton.icon(
                             onPressed: _pickEventVideo,
                             icon: const Icon(Icons.video_library),
-                            label: const Text('Upload Video'),
+                            label: Text('upload_video'.tr),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Color(0xFFFF9800),
                               foregroundColor: Colors.white,
@@ -169,9 +208,9 @@ class _EventCreationPageState extends State<EventCreationPage> {
                         Expanded(
                           child: TextField(
                             controller: _videoUrlController,
-                            decoration: const InputDecoration(
-                              labelText: 'YouTube URL',
-                              hintText: 'Paste YouTube link',
+                            decoration: InputDecoration(
+                              labelText: 'youtube_url'.tr,
+                              hintText: 'paste_youtube_link'.tr,
                               border: OutlineInputBorder(),
                             ),
                             onChanged: (val) {
@@ -185,7 +224,7 @@ class _EventCreationPageState extends State<EventCreationPage> {
                       Padding(
                         padding: const EdgeInsets.only(top: 8.0),
                         child: Text(
-                          'Video selected: ${_eventVideoFile!.path.split(Platform.pathSeparator).last}',
+                          '${'video_selected'.tr}: ${_eventVideoFile!.path.split(Platform.pathSeparator).last}',
                           style: const TextStyle(color: Colors.green),
                         ),
                       ),
@@ -193,7 +232,7 @@ class _EventCreationPageState extends State<EventCreationPage> {
                       Padding(
                         padding: const EdgeInsets.only(top: 8.0),
                         child: Text(
-                          'YouTube URL: ${_videoUrlController.text}',
+                          '${'youtube_url'.tr}: ${_videoUrlController.text}',
                           style: const TextStyle(color: Colors.blue),
                         ),
                       ),
@@ -208,7 +247,7 @@ class _EventCreationPageState extends State<EventCreationPage> {
                     ElevatedButton.icon(
                       onPressed: _pickBannerImage,
                       icon: const Icon(Icons.image),
-                      label: const Text('Upload Banner'),
+                      label: Text('upload_banner'.tr),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Color(0xFFFF9800),
                         foregroundColor: Colors.white,
@@ -224,13 +263,13 @@ class _EventCreationPageState extends State<EventCreationPage> {
               ]),
               const SizedBox(height: 24),
 
-              _buildSectionHeader('📍 Location & Date'),
+              _buildSectionHeader('📍 ${'location_and_date'.tr}'),
               _buildCard([
                 _buildTextField(
-                  label: 'Event Location *',
-                  hint: 'Enter location',
+                  label: 'event_location_required'.tr,
+                  hint: 'enter_location'.tr,
                   onSaved: (value) => eventLocation = value,
-                  validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+                  validator: (value) => value?.isEmpty ?? true ? 'required'.tr : null,
                   prefixIcon: Icons.location_on,
                 ),
                 const SizedBox(height: 16),
@@ -244,34 +283,34 @@ class _EventCreationPageState extends State<EventCreationPage> {
               ]),
               const SizedBox(height: 24),
 
-              _buildSectionHeader('🏁 Race Details'),
+              _buildSectionHeader('🏁 ${'race_details'.tr}'),
               _buildCard([
                 _buildTextField(
-                  label: 'Total Number of Participants *',
-                  hint: 'Enter number',
+                  label: 'total_participants_required'.tr,
+                  hint: 'enter_number'.tr,
                   keyboardType: TextInputType.number,
                   onSaved: (value) => totalParticipants = int.tryParse(value ?? '0'),
-                  validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+                  validator: (value) => value?.isEmpty ?? true ? 'required'.tr : null,
                   prefixIcon: Icons.people,
                 ),
                 const SizedBox(height: 16),
                 _buildTextField(
-                  label: 'Number of Tracks *',
-                  hint: 'Enter number of tracks',
+                  label: 'number_of_tracks_required'.tr,
+                  hint: 'enter_number_of_tracks'.tr,
                   keyboardType: TextInputType.number,
                   onSaved: (value) => numberOfTracks = int.tryParse(value ?? '0'),
-                  validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+                  validator: (value) => value?.isEmpty ?? true ? 'required'.tr : null,
                   prefixIcon: Icons.analytics,
                 ),
               ]),
               const SizedBox(height: 24),
 
-              _buildSectionHeader('🧾 Documents & Fees'),
+              _buildSectionHeader('🧾 ${'documents_and_fees'.tr}'),
               _buildCard([
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildImageUploadButton('Approval Certificate *', onFilePicked: (file) {
+                    _buildImageUploadButton('approval_certificate_required'.tr, onFilePicked: (file) {
                       setState(() {
                         _approvalCertificate = file;
                       });
@@ -280,7 +319,7 @@ class _EventCreationPageState extends State<EventCreationPage> {
                       Padding(
                         padding: const EdgeInsets.only(top: 8.0),
                         child: Text(
-                          'Selected: ${_approvalCertificate!.path.split(Platform.pathSeparator).last}',
+                          '${'selected'.tr}: ${_approvalCertificate!.path.split(Platform.pathSeparator).last}',
                           style: const TextStyle(color: Colors.green),
                         ),
                       ),
@@ -288,21 +327,21 @@ class _EventCreationPageState extends State<EventCreationPage> {
                 ),
                 const SizedBox(height: 16),
                 _buildTextField(
-                  label: 'Registration Fees (₹) *',
-                  hint: 'Enter amount',
+                  label: 'registration_fees_required'.tr,
+                  hint: 'enter_amount'.tr,
                   keyboardType: TextInputType.number,
                   onSaved: (value) => registrationFees = double.tryParse(value ?? '0'),
-                  validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+                  validator: (value) => value?.isEmpty ?? true ? 'required'.tr : null,
                   prefixIcon: Icons.currency_rupee,
                 ),
               ]),
               const SizedBox(height: 24),
 
-              _buildSectionHeader('💼 Sponsors'),
+              _buildSectionHeader('💼 ${'sponsors'.tr}'),
               _buildCard([
                 ...sponsors.asMap().entries.map((entry) {
                   return _buildSponsorCard(entry.key);
-                }).toList(),
+                }),
                 const SizedBox(height: 16),
                 OutlinedButton.icon(
                   onPressed: () {
@@ -311,7 +350,7 @@ class _EventCreationPageState extends State<EventCreationPage> {
                     });
                   },
                   icon: const Icon(Icons.add),
-                  label: const Text('Add Sponsor'),
+                  label: Text('add_sponsor'.tr),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: const Color(0xFFD87B3A),
                     side: const BorderSide(color: Color(0xFFD87B3A)),
@@ -329,7 +368,7 @@ class _EventCreationPageState extends State<EventCreationPage> {
                         if (_formKey.currentState?.validate() ?? false) {
                           _formKey.currentState?.save();
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Draft Saved!')),
+                            SnackBar(content: Text('draft_saved'.tr)),
                           );
                         }
                       },
@@ -337,7 +376,7 @@ class _EventCreationPageState extends State<EventCreationPage> {
                         foregroundColor: const Color(0xFF8B4513),
                         padding: const EdgeInsets.symmetric(vertical: 16),
                       ),
-                      child: const Text('Save Draft'),
+                      child: Text('save_draft'.tr),
                     ),
                   ),
                   const SizedBox(width: 16),
@@ -348,7 +387,7 @@ class _EventCreationPageState extends State<EventCreationPage> {
                         backgroundColor: const Color(0xFF6B8E23),
                         padding: const EdgeInsets.symmetric(vertical: 16),
                       ),
-                      child: const Text('Submit for Approval'),
+                      child: Text('submit_for_approval'.tr),
                     ),
                   ),
                 ],
@@ -398,7 +437,21 @@ class _EventCreationPageState extends State<EventCreationPage> {
         hintText: hint,
         prefixIcon:
         prefixIcon != null ? Icon(prefixIcon, color: const Color(0xFFD87B3A)) : null,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+        filled: true,
+        fillColor: Colors.white,
+        labelStyle: const TextStyle(
+          color: Colors.black54,
+        ),
+        floatingLabelStyle: const TextStyle(
+          color: Color(0xFFD87B3A),
+          fontWeight: FontWeight.w600,
+          backgroundColor: Colors.white,
+        ),
+        floatingLabelBehavior: FloatingLabelBehavior.auto,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Colors.grey.shade300),
+        ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(color: Colors.grey.shade300),
@@ -446,7 +499,7 @@ class _EventCreationPageState extends State<EventCreationPage> {
               ),
               const SizedBox(height: 4),
               Text(
-                'Tap to upload',
+                'tap_to_upload'.tr,
                 style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
               ),
             ],
@@ -473,14 +526,14 @@ class _EventCreationPageState extends State<EventCreationPage> {
       },
       child: InputDecorator(
         decoration: InputDecoration(
-          labelText: 'Event Date *',
+          labelText: 'event_date_required'.tr,
           prefixIcon: const Icon(Icons.calendar_today, color: Color(0xFFD87B3A)),
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
         ),
         child: Text(
           eventDate != null
-              ? '${eventDate!.day}/${eventDate!.month}/${eventDate!.year}'
-              : 'Select date',
+              ? MarathiUtils.formatDate(eventDate!.toIso8601String())
+              : 'select_date'.tr,
           style: TextStyle(color: eventDate != null ? Colors.black : Colors.grey),
         ),
       ),
@@ -499,12 +552,12 @@ class _EventCreationPageState extends State<EventCreationPage> {
       },
       child: InputDecorator(
         decoration: InputDecoration(
-          labelText: 'Event Time *',
+          labelText: 'event_time_required'.tr,
           prefixIcon: const Icon(Icons.access_time, color: Color(0xFFD87B3A)),
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
         ),
         child: Text(
-          eventTime != null ? eventTime!.format(context) : 'Select time',
+          eventTime != null ? eventTime!.format(context) : 'select_time'.tr,
           style: TextStyle(color: eventTime != null ? Colors.black : Colors.grey),
         ),
       ),
@@ -524,7 +577,7 @@ class _EventCreationPageState extends State<EventCreationPage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Sponsor ${index + 1}',
+                  '${'sponsor'.tr} ${index + 1}',
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -544,15 +597,35 @@ class _EventCreationPageState extends State<EventCreationPage> {
             const SizedBox(height: 12),
             TextFormField(
               decoration: InputDecoration(
-                labelText: 'Sponsor Name',
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                labelText: 'sponsor_name'.tr,
+                filled: true,
+                fillColor: Colors.white,
+                labelStyle: const TextStyle(color: Colors.black54),
+                floatingLabelStyle: const TextStyle(
+                  color: Color(0xFFD87B3A),
+                  fontWeight: FontWeight.w600,
+                  backgroundColor: Colors.white,
+                ),
+                floatingLabelBehavior: FloatingLabelBehavior.auto,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: Colors.grey.shade300),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: Colors.grey.shade300),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: Color(0xFFD87B3A), width: 2),
+                ),
               ),
               onChanged: (value) {
                 sponsors[index]['name'] = value;
               },
             ),
             const SizedBox(height: 12),
-            _buildImageUploadButton('Sponsor Photo', onFilePicked: (file) {
+            _buildImageUploadButton('sponsor_photo'.tr, onFilePicked: (file) {
               setState(() {
                 sponsors[index]['photoPath'] = file.path;
               });
@@ -561,15 +634,35 @@ class _EventCreationPageState extends State<EventCreationPage> {
               Padding(
                 padding: const EdgeInsets.only(top: 8.0),
                 child: Text(
-                  'Selected: ${sponsors[index]['photoPath'].split(Platform.pathSeparator).last}',
+                  '${'selected'.tr}: ${sponsors[index]['photoPath'].split(Platform.pathSeparator).last}',
                   style: const TextStyle(color: Colors.green),
                 ),
               ),
             const SizedBox(height: 12),
             TextFormField(
               decoration: InputDecoration(
-                labelText: 'Sponsor Intro',
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                labelText: 'sponsor_intro'.tr,
+                filled: true,
+                fillColor: Colors.white,
+                labelStyle: const TextStyle(color: Colors.black54),
+                floatingLabelStyle: const TextStyle(
+                  color: Color(0xFFD87B3A),
+                  fontWeight: FontWeight.w600,
+                  backgroundColor: Colors.white,
+                ),
+                floatingLabelBehavior: FloatingLabelBehavior.auto,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: Colors.grey.shade300),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: Colors.grey.shade300),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: Color(0xFFD87B3A), width: 2),
+                ),
               ),
               maxLines: 3,
               onChanged: (value) {

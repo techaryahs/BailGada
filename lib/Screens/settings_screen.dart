@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import '../services/translation_service.dart';
 import '../utils/translation_helper.dart';
-import '../widgets/language_selector.dart';
+import '../widgets/modern_language_selector.dart';
+import '../debug/translation_debug_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -18,47 +19,96 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return TranslationBuilder(
       builder: (context) => Scaffold(
         appBar: AppBar(
-          title: Text('settings'.tr),
+          title: Text(
+            'settings'.tr,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
           backgroundColor: Theme.of(context).primaryColor,
         ),
         body: ListView(
           children: [
             ListTile(
               leading: const Icon(Icons.language),
-              title: Text('language'.tr),
-              subtitle: Text('select_language'.tr),
-              trailing: const LanguageSelector(showAsDropdown: true),
+              title: Text(
+                'language'.tr,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              subtitle: Text(
+                'select_language'.tr,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              trailing: const ModernLanguageSelector(showAsBottomSheet: true),
             ),
             const Divider(),
             ListTile(
               leading: const Icon(Icons.notifications),
-              title: Text('notifications'.tr),
+              title: Text(
+                'notifications'.tr,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
               trailing: const Icon(Icons.chevron_right),
               onTap: () {},
             ),
             ListTile(
               leading: const Icon(Icons.privacy_tip),
-              title: Text('privacy'.tr),
+              title: Text(
+                'privacy'.tr,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
               trailing: const Icon(Icons.chevron_right),
               onTap: () {},
             ),
             ListTile(
               leading: const Icon(Icons.description),
-              title: Text('terms'.tr),
+              title: Text(
+                'terms'.tr,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
               trailing: const Icon(Icons.chevron_right),
               onTap: () {},
             ),
             ListTile(
               leading: const Icon(Icons.help),
-              title: Text('help'.tr),
+              title: Text(
+                'help'.tr,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
               trailing: const Icon(Icons.chevron_right),
               onTap: () {},
             ),
             ListTile(
               leading: const Icon(Icons.info),
-              title: Text('about'.tr),
+              title: Text(
+                'about'.tr,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
               trailing: const Icon(Icons.chevron_right),
               onTap: () {},
+            ),
+            ListTile(
+              leading: const Icon(Icons.bug_report),
+              title: Text(
+                'translation_debug'.tr,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const TranslationDebugScreen(),
+                  ),
+                );
+              },
             ),
             const Divider(),
             Padding(

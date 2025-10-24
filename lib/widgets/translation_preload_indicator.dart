@@ -62,7 +62,7 @@ class _TranslationPreloadIndicatorState extends State<TranslationPreloadIndicato
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.orange.withOpacity(0.5),
+                    color: Colors.orange.withValues(alpha: 0.5),
                     blurRadius: 20,
                     offset: const Offset(0, 4),
                   ),
@@ -107,7 +107,7 @@ class _TranslationPreloadIndicatorState extends State<TranslationPreloadIndicato
                     borderRadius: BorderRadius.circular(8),
                     child: LinearProgressIndicator(
                       value: _translationService.preloadProgress,
-                      backgroundColor: Colors.white.withOpacity(0.3),
+                      backgroundColor: Colors.white.withValues(alpha: 0.3),
                       valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
                       minHeight: 6,
                     ),

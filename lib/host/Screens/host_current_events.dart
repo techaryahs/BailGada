@@ -2,7 +2,9 @@ import 'dart:io';
 import 'package:bailgada/host/Screens/event_host_page.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import '../../Screens/EventDetailsScreen.dart';
+import '../../widgets/dynamic_translated_text.dart';
+import '../../widgets/live_translated_text.dart';
+import '../../utils/translation_helper.dart';
 
 class HostCurrentEventsPage extends StatefulWidget {
   const HostCurrentEventsPage({super.key});
@@ -28,7 +30,7 @@ class _HostCurrentEventsPageState extends State<HostCurrentEventsPage> {
 
         if (snapshot.hasError) {
           return const Center(
-            child: Text("Error loading events",
+            child: LiveTranslatedText("error_loading_events",
                 style: TextStyle(color: Colors.redAccent)),
           );
         }
@@ -43,7 +45,7 @@ class _HostCurrentEventsPageState extends State<HostCurrentEventsPage> {
         }
 
         final data = Map<dynamic, dynamic>.from(
-            (snapshot.data! as DatabaseEvent).snapshot.value as Map);
+            snapshot.data!.snapshot.value as Map);
         final allEvents = data.entries.map((e) {
           return Map<String, dynamic>.from(e.value);
         }).toList();
@@ -76,14 +78,27 @@ class _HostCurrentEventsPageState extends State<HostCurrentEventsPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                "🔥 Your Current Events",
-                style: TextStyle(
-                  color: Colors.orangeAccent,
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                  shadows: [Shadow(color: Colors.orange, blurRadius: 2)],
-                ),
+              Row(
+                children: [
+                  const Text(
+                    "🔥 ",
+                    style: TextStyle(
+                      color: Colors.orangeAccent,
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      shadows: [Shadow(color: Colors.orange, blurRadius: 2)],
+                    ),
+                  ),
+                  LiveTranslatedText(
+                    "current_events",
+                    style: const TextStyle(
+                      color: Colors.orangeAccent,
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      shadows: [Shadow(color: Colors.orange, blurRadius: 2)],
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 20),
 
@@ -109,12 +124,12 @@ class _HostCurrentEventsPageState extends State<HostCurrentEventsPage> {
       child: Container(
         margin: const EdgeInsets.only(bottom: 24),
         decoration: BoxDecoration(
-          color: Colors.black.withOpacity(0.8),
+          color: Colors.black.withValues(alpha: 0.8),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.orange.withOpacity(0.4)),
+          border: Border.all(color: Colors.orange.withValues(alpha: 0.4)),
           boxShadow: [
             BoxShadow(
-              color: Colors.orange.withOpacity(0.3),
+              color: Colors.orange.withValues(alpha: 0.3),
               blurRadius: 10,
               offset: const Offset(0, 5),
             ),
@@ -147,9 +162,9 @@ class _HostCurrentEventsPageState extends State<HostCurrentEventsPage> {
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [
-                          Colors.black.withOpacity(0.7),
+                          Colors.black.withValues(alpha: 0.7),
                           Colors.transparent,
-                          Colors.black.withOpacity(0.6),
+                          Colors.black.withValues(alpha: 0.6),
                         ],
                         begin: Alignment.bottomCenter,
                         end: Alignment.topCenter,
@@ -159,8 +174,8 @@ class _HostCurrentEventsPageState extends State<HostCurrentEventsPage> {
                   Positioned(
                     bottom: 12,
                     left: 16,
-                    child: Text(
-                      event["eventName"] ?? "Untitled Event",
+                    child: DynamicTranslatedText(
+                      event["eventName"] ?? "untitled_event".tr,
                       style: const TextStyle(
                         color: Colors.orangeAccent,
                         fontSize: 18,
@@ -224,8 +239,8 @@ class _HostCurrentEventsPageState extends State<HostCurrentEventsPage> {
                       ),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: const Text(
-                      "LIVE",
+                    child: const LiveTranslatedText(
+                      "live",
                       style: TextStyle(
                         color: Colors.black,
                         fontWeight: FontWeight.bold,

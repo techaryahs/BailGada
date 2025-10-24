@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import '../../utils/marathi_utils.dart';
+import '../../utils/translation_helper.dart';
 
 class Addeventscreen extends StatefulWidget {
   const Addeventscreen({super.key});
@@ -47,7 +48,7 @@ class _AddeventscreenState extends State<Addeventscreen> {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-        title: const Text("Add Event"),
+        title: Text("add_event".tr),
         centerTitle: true,
         elevation: 0,
         backgroundColor: Colors.transparent,
@@ -134,7 +135,7 @@ class _AddeventscreenState extends State<Addeventscreen> {
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(14)),
                             elevation: 10,
-                            shadowColor: Colors.orangeAccent.withOpacity(0.6),
+                            shadowColor: Colors.orangeAccent.withValues(alpha: 0.6),
                           ),
                           child: const Text(
                             "Submit",
@@ -165,12 +166,24 @@ class _AddeventscreenState extends State<Addeventscreen> {
         style: const TextStyle(color: Colors.white),
         decoration: InputDecoration(
           labelText: label,
-          labelStyle:
-          const TextStyle(color: Colors.orangeAccent, fontSize: 15),
+          labelStyle: const TextStyle(
+            color: Colors.orangeAccent,
+            fontSize: 15,
+          ),
+          floatingLabelStyle: const TextStyle(
+            color: Colors.deepOrangeAccent,
+            fontWeight: FontWeight.w600,
+            backgroundColor: Colors.black,
+          ),
+          floatingLabelBehavior: FloatingLabelBehavior.auto,
           filled: true,
-          fillColor: Colors.black.withOpacity(0.3),
+          fillColor: Colors.black.withValues(alpha: 0.3),
           contentPadding:
           const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          border: OutlineInputBorder(
+            borderSide: const BorderSide(color: Colors.orangeAccent),
+            borderRadius: BorderRadius.circular(14),
+          ),
           enabledBorder: OutlineInputBorder(
             borderSide: const BorderSide(color: Colors.orangeAccent),
             borderRadius: BorderRadius.circular(14),
@@ -204,7 +217,7 @@ class _AddeventscreenState extends State<Addeventscreen> {
             borderRadius: BorderRadius.circular(14),
             border: Border.all(color: Colors.orangeAccent),
             gradient: LinearGradient(
-              colors: [Colors.orange.withOpacity(0.2), Colors.black.withOpacity(0.4)],
+              colors: [Colors.orange.withValues(alpha: 0.2), Colors.black.withValues(alpha: 0.4)],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
@@ -234,7 +247,7 @@ class _AddeventscreenState extends State<Addeventscreen> {
         child: Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.black.withOpacity(0.3),
+            color: Colors.black.withValues(alpha: 0.3),
             border: Border.all(color: Colors.orangeAccent),
             borderRadius: BorderRadius.circular(14),
           ),
@@ -244,9 +257,8 @@ class _AddeventscreenState extends State<Addeventscreen> {
               const SizedBox(width: 10),
               Text(
                 _selectedDateTime == null
-                    ? "Select Event Date & Time"
-                    : DateFormat('dd MMM yyyy, hh:mm a')
-                    .format(_selectedDateTime!),
+                    ? "select_date".tr
+                    : '${MarathiUtils.formatDate(_selectedDateTime!.toIso8601String())}, ${_selectedDateTime!.hour}:${_selectedDateTime!.minute.toString().padLeft(2, '0')}',
                 style: const TextStyle(color: Colors.white, fontSize: 15),
               ),
             ],

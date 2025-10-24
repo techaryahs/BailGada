@@ -1,10 +1,18 @@
 import 'dart:io';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import '../../Screens/EventDetailsScreen.dart';
+import '../../Screens/event_details_screen.dart';
+import '../../widgets/dynamic_translated_text.dart';
+import '../../widgets/live_translated_text.dart';
+import '../../utils/translation_helper.dart';
 
 class HostPastEventsPage extends StatefulWidget {
-  const HostPastEventsPage({super.key});
+  final String userKey;
+
+  const HostPastEventsPage({
+    super.key,
+    required this.userKey
+  });
 
   @override
   State<HostPastEventsPage> createState() => _HostPastEventsPageState();
@@ -42,7 +50,7 @@ class _HostPastEventsPageState extends State<HostPastEventsPage> {
         }
 
         final data = Map<dynamic, dynamic>.from(
-            (snapshot.data! as DatabaseEvent).snapshot.value as Map);
+            snapshot.data!.snapshot.value as Map);
         final allEvents = data.entries.map((e) {
           return Map<String, dynamic>.from(e.value);
         }).toList();
@@ -75,14 +83,27 @@ class _HostPastEventsPageState extends State<HostPastEventsPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                "⏳ Your Past Events",
-                style: TextStyle(
-                  color: Colors.orangeAccent,
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                  shadows: [Shadow(color: Colors.orange, blurRadius: 2)],
-                ),
+              Row(
+                children: [
+                  const Text(
+                    "⏳ ",
+                    style: TextStyle(
+                      color: Colors.orangeAccent,
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      shadows: [Shadow(color: Colors.orange, blurRadius: 2)],
+                    ),
+                  ),
+                  LiveTranslatedText(
+                    "past_events",
+                    style: const TextStyle(
+                      color: Colors.orangeAccent,
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      shadows: [Shadow(color: Colors.orange, blurRadius: 2)],
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 20),
               ...pastEvents.map((event) => _buildEventCard(context, event)),
@@ -99,19 +120,19 @@ class _HostPastEventsPageState extends State<HostPastEventsPage> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => EventDetailsScreen(event: event),
+            builder: (context) => EventDetailsScreen(event: event, userKey: widget.userKey,),
           ),
         );
       },
       child: Container(
         margin: const EdgeInsets.only(bottom: 24),
         decoration: BoxDecoration(
-          color: Colors.black.withOpacity(0.8),
+          color: Colors.black.withValues(alpha: 0.8),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.orange.withOpacity(0.4)),
+          border: Border.all(color: Colors.orange.withValues(alpha: 0.4)),
           boxShadow: [
             BoxShadow(
-              color: Colors.orange.withOpacity(0.3),
+              color: Colors.orange.withValues(alpha: 0.3),
               blurRadius: 10,
               offset: const Offset(0, 5),
             ),
@@ -144,9 +165,9 @@ class _HostPastEventsPageState extends State<HostPastEventsPage> {
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [
-                          Colors.black.withOpacity(0.7),
+                          Colors.black.withValues(alpha: 0.7),
                           Colors.transparent,
-                          Colors.black.withOpacity(0.6),
+                          Colors.black.withValues(alpha: 0.6),
                         ],
                         begin: Alignment.bottomCenter,
                         end: Alignment.topCenter,
@@ -156,8 +177,8 @@ class _HostPastEventsPageState extends State<HostPastEventsPage> {
                   Positioned(
                     bottom: 12,
                     left: 16,
-                    child: Text(
-                      event["eventName"] ?? "Untitled Event",
+                    child: DynamicTranslatedText(
+                      event["eventName"] ?? "untitled_event".tr,
                       style: const TextStyle(
                         color: Colors.orangeAccent,
                         fontSize: 18,
@@ -221,8 +242,8 @@ class _HostPastEventsPageState extends State<HostPastEventsPage> {
                       ),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: const Text(
-                      "ENDED",
+                    child: const LiveTranslatedText(
+                      "ended",
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -257,14 +278,14 @@ class _HostPastEventsPageState extends State<HostPastEventsPage> {
                 children: [
                   _buildActionButton(
                     icon: Icons.bar_chart,
-                    label: "View Results",
+                    label: "view_results".tr,
                     gradient: const LinearGradient(
                       colors: [Colors.deepOrange, Colors.orangeAccent],
                     ),
                     onTap: () {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text("Results screen coming soon!"),
+                        SnackBar(
+                          content: Text("results_screen_coming_soon".tr),
                         ),
                       );
                     },
@@ -278,8 +299,8 @@ class _HostPastEventsPageState extends State<HostPastEventsPage> {
                     ),
                     onTap: () {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text("Re-Host feature coming soon!"),
+                        SnackBar(
+                          content: Text("rehost_feature_coming_soon".tr),
                         ),
                       );
                     },
@@ -311,7 +332,7 @@ class _HostPastEventsPageState extends State<HostPastEventsPage> {
             borderRadius: BorderRadius.circular(10),
             boxShadow: [
               BoxShadow(
-                color: gradient.colors.first.withOpacity(0.4),
+                color: gradient.colors.first.withValues(alpha: 0.4),
                 blurRadius: 6,
                 offset: const Offset(0, 3),
               ),

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../Screens/EventDetailsScreen.dart';
 import 'admin_event_details_page.dart';
 
 class AdminEventsPage extends StatelessWidget {
@@ -76,16 +75,16 @@ class AdminEventsPage extends StatelessWidget {
       child: Container(
         margin: const EdgeInsets.only(bottom: 24),
         decoration: BoxDecoration(
-          color: Colors.black.withOpacity(0.7),
+          color: Colors.black.withValues(alpha: 0.7),
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.orange.withOpacity(0.3),
+              color: Colors.orange.withValues(alpha: 0.3),
               blurRadius: 10,
               offset: const Offset(0, 5),
             ),
           ],
-          border: Border.all(color: Colors.orange.withOpacity(0.4)),
+          border: Border.all(color: Colors.orange.withValues(alpha: 0.4)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -111,9 +110,9 @@ class AdminEventsPage extends StatelessWidget {
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [
-                          Colors.black.withOpacity(0.7),
+                          Colors.black.withValues(alpha: 0.7),
                           Colors.transparent,
-                          Colors.black.withOpacity(0.6),
+                          Colors.black.withValues(alpha: 0.6),
                         ],
                         begin: Alignment.bottomCenter,
                         end: Alignment.topCenter,
@@ -253,7 +252,7 @@ class AdminEventsPage extends StatelessWidget {
                           borderRadius: BorderRadius.circular(12),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.greenAccent.withOpacity(0.4),
+                              color: Colors.greenAccent.withValues(alpha: 0.4),
                               blurRadius: 10,
                               offset: const Offset(0, 4),
                             ),
@@ -302,7 +301,7 @@ class AdminEventsPage extends StatelessWidget {
                           borderRadius: BorderRadius.circular(12),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.redAccent.withOpacity(0.4),
+                              color: Colors.redAccent.withValues(alpha: 0.4),
                               blurRadius: 10,
                               offset: const Offset(0, 4),
                             ),

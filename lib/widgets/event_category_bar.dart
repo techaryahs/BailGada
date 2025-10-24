@@ -21,7 +21,7 @@ class EventCategoryBar extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.brown.withOpacity(0.2),
+            color: Colors.brown.withValues(alpha: 0.2),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -54,7 +54,7 @@ class EventCategoryBar extends StatelessWidget {
         duration: const Duration(milliseconds: 250),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected ? activeColor.withOpacity(0.15) : Colors.transparent,
+          color: isSelected ? activeColor.withValues(alpha: 0.15) : Colors.transparent,
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
             color: isSelected ? activeColor : Colors.white24,
@@ -62,6 +62,7 @@ class EventCategoryBar extends StatelessWidget {
           ),
         ),
         child: Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
               icon,
@@ -76,6 +77,8 @@ class EventCategoryBar extends StatelessWidget {
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                 fontSize: 13,
               ),
+              maxLines: 1,
+              overflow: TextOverflow.visible,
             ),
           ],
         ),

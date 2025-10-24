@@ -51,7 +51,7 @@ class ForgotPassword extends StatelessWidget {
                   style: const TextStyle(color: Colors.white),
                   decoration: InputDecoration(
                     filled: true,
-                    fillColor: Colors.black.withOpacity(0.6),
+                    fillColor: Colors.black.withValues(alpha: 0.6),
                     prefixIcon: const Icon(Icons.email, color: Colors.orange),
                     labelText: "Email",
                     labelStyle: const TextStyle(color: Colors.orange),

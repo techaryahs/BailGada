@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'dart:convert';
-import 'dart:ui';
 import 'package:crypto/crypto.dart';
+import '../utils/translation_helper.dart';
 import 'signin.dart';
 
 class SignUp extends StatefulWidget {
-  const SignUp({super.key});
+  final String userKey;
+
+  const SignUp({super.key, required this.userKey});
 
   @override
   State<SignUp> createState() => _SignUpState();
@@ -38,7 +40,7 @@ class _SignUpState extends State<SignUp> {
     if (!_formKey.currentState!.validate()) return;
 
     if (!acceptTerms) {
-      _showMessage("Please accept the Terms and Conditions");
+      _showMessage("please_accept_terms".tr);
       return;
     }
 
@@ -67,15 +69,15 @@ class _SignUpState extends State<SignUp> {
       });
 
       if (mounted) {
-        _showMessage("User registered successfully!");
+        _showMessage("user_registered_successfully".tr);
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const SignIn()),
+          MaterialPageRoute(builder: (context) => SignIn(userKey: widget.userKey,)),
         );
       }
 
     } catch (e) {
-      _showMessage("Error: $e");
+      _showMessage("${'error'.tr}: $e");
     } finally {
       if (mounted) {
         setState(() => isLoading = false);
@@ -103,7 +105,7 @@ class _SignUpState extends State<SignUp> {
             colors: [
               Colors.white,
               AppColors.background,
-              AppColors.accent.withOpacity(0.3),
+              AppColors.accent.withValues(alpha: 0.3),
             ],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
@@ -129,7 +131,7 @@ class _SignUpState extends State<SignUp> {
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: AppColors.primary.withOpacity(0.5),
+                          color: AppColors.primary.withValues(alpha: 0.5),
                           blurRadius: 20,
                           offset: const Offset(0, 10),
                         ),
@@ -147,23 +149,27 @@ class _SignUpState extends State<SignUp> {
                     shaderCallback: (bounds) => LinearGradient(
                       colors: [AppColors.primary, AppColors.darkOrange],
                     ).createShader(bounds),
-                    child: const Text(
-                      "Create Account",
-                      style: TextStyle(
-                        fontSize: 32,
-                        fontWeight: FontWeight.w900,
-                        color: Colors.white,
-                        letterSpacing: 1.2,
+                    child: TranslationBuilder(
+                      builder: (context) => Text(
+                        "create_account".tr,
+                        style: const TextStyle(
+                          fontSize: 32,
+                          fontWeight: FontWeight.w900,
+                          color: Colors.white,
+                          letterSpacing: 1.2,
+                        ),
                       ),
                     ),
                   ),
                   const SizedBox(height: 8),
-                  Text(
-                    "Join BailGada Race today",
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: AppColors.secondary.withOpacity(0.7),
-                      fontWeight: FontWeight.w500,
+                  TranslationBuilder(
+                    builder: (context) => Text(
+                      "join_bailgada_race".tr,
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: AppColors.secondary.withValues(alpha: 0.7),
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 40),
@@ -175,7 +181,7 @@ class _SignUpState extends State<SignUp> {
                       borderRadius: BorderRadius.circular(24),
                       boxShadow: [
                         BoxShadow(
-                          color: AppColors.primary.withOpacity(0.15),
+                          color: AppColors.primary.withValues(alpha: 0.15),
                           blurRadius: 30,
                           offset: const Offset(0, 10),
                         ),
@@ -185,85 +191,95 @@ class _SignUpState extends State<SignUp> {
                       key: _formKey,
                       child: Column(
                         children: [
-                          _buildTextField(
-                            controller: _nameController,
-                            label: "Full Name",
-                            icon: Icons.person_rounded,
-                            validator: (value) {
-                              if (value == null || value.trim().isEmpty) {
-                                return 'Please enter your name';
-                              }
-                              return null;
-                            },
+                          TranslationBuilder(
+                            builder: (context) => _buildTextField(
+                              controller: _nameController,
+                              label: "full_name".tr,
+                              icon: Icons.person_rounded,
+                              validator: (value) {
+                                if (value == null || value.trim().isEmpty) {
+                                  return 'please_enter_name'.tr;
+                                }
+                                return null;
+                              },
+                            ),
                           ),
                           const SizedBox(height: 16),
-                          _buildTextField(
-                            controller: _emailController,
-                            label: "Email Address",
-                            icon: Icons.email_rounded,
-                            keyboardType: TextInputType.emailAddress,
-                            validator: (value) {
-                              if (value == null || value.trim().isEmpty) {
-                                return 'Please enter your email';
-                              }
-                              if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
-                                  .hasMatch(value)) {
-                                return 'Please enter a valid email';
-                              }
-                              return null;
-                            },
+                          TranslationBuilder(
+                            builder: (context) => _buildTextField(
+                              controller: _emailController,
+                              label: "email_address".tr,
+                              icon: Icons.email_rounded,
+                              keyboardType: TextInputType.emailAddress,
+                              validator: (value) {
+                                if (value == null || value.trim().isEmpty) {
+                                  return 'please_enter_email'.tr;
+                                }
+                                if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+                                    .hasMatch(value)) {
+                                  return 'please_enter_valid_email'.tr;
+                                }
+                                return null;
+                              },
+                            ),
                           ),
                           const SizedBox(height: 16),
-                          _buildTextField(
-                            controller: _phoneController,
-                            label: "Phone Number",
-                            icon: Icons.phone_rounded,
-                            keyboardType: TextInputType.phone,
-                            inputFormatters: [
-                              FilteringTextInputFormatter.digitsOnly,
-                              LengthLimitingTextInputFormatter(10),
-                            ],
-                            validator: (value) {
-                              if (value == null || value.trim().isEmpty) {
-                                return 'Please enter your phone number';
-                              }
-                              if (value.length != 10) {
-                                return 'Please enter a valid 10-digit number';
-                              }
-                              return null;
-                            },
+                          TranslationBuilder(
+                            builder: (context) => _buildTextField(
+                              controller: _phoneController,
+                              label: "phone_number".tr,
+                              icon: Icons.phone_rounded,
+                              keyboardType: TextInputType.phone,
+                              inputFormatters: [
+                                FilteringTextInputFormatter.digitsOnly,
+                                LengthLimitingTextInputFormatter(10),
+                              ],
+                              validator: (value) {
+                                if (value == null || value.trim().isEmpty) {
+                                  return 'please_enter_phone'.tr;
+                                }
+                                if (value.length != 10) {
+                                  return 'please_enter_valid_phone'.tr;
+                                }
+                                return null;
+                              },
+                            ),
                           ),
                           const SizedBox(height: 16),
-                          _buildTextField(
-                            controller: _passwordController,
-                            label: "Password",
-                            icon: Icons.lock_rounded,
-                            obscure: true,
-                            validator: (value) {
-                              if (value == null || value.trim().isEmpty) {
-                                return 'Please enter your password';
-                              }
-                              if (value.length < 6) {
-                                return 'Password must be at least 6 characters';
-                              }
-                              return null;
-                            },
+                          TranslationBuilder(
+                            builder: (context) => _buildTextField(
+                              controller: _passwordController,
+                              label: "password".tr,
+                              icon: Icons.lock_rounded,
+                              obscure: true,
+                              validator: (value) {
+                                if (value == null || value.trim().isEmpty) {
+                                  return 'please_enter_password'.tr;
+                                }
+                                if (value.length < 6) {
+                                  return 'password_min_6'.tr;
+                                }
+                                return null;
+                              },
+                            ),
                           ),
                           const SizedBox(height: 16),
-                          _buildTextField(
-                            controller: _confirmPasswordController,
-                            label: "Confirm Password",
-                            icon: Icons.lock_rounded,
-                            obscure: true,
-                            validator: (value) {
-                              if (value == null || value.trim().isEmpty) {
-                                return 'Please confirm your password';
-                              }
-                              if (value != _passwordController.text) {
-                                return 'Passwords do not match';
-                              }
-                              return null;
-                            },
+                          TranslationBuilder(
+                            builder: (context) => _buildTextField(
+                              controller: _confirmPasswordController,
+                              label: "confirm_password".tr,
+                              icon: Icons.lock_rounded,
+                              obscure: true,
+                              validator: (value) {
+                                if (value == null || value.trim().isEmpty) {
+                                  return 'please_confirm_password'.tr;
+                                }
+                                if (value != _passwordController.text) {
+                                  return 'passwords_dont_match'.tr;
+                                }
+                                return null;
+                              },
+                            ),
                           ),
                           const SizedBox(height: 20),
                           Row(
@@ -278,12 +294,16 @@ class _SignUpState extends State<SignUp> {
                                 ),
                               ),
                               Expanded(
-                                child: Text(
-                                  'I agree to the Terms & Conditions',
-                                  style: TextStyle(
-                                    color: AppColors.secondary.withOpacity(0.7),
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
+                                child: TranslationBuilder(
+                                  builder: (context) => Text(
+                                    'agree_terms'.tr,
+                                    style: TextStyle(
+                                      color: AppColors.secondary.withValues(alpha: 0.7),
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
                               ),
@@ -301,7 +321,7 @@ class _SignUpState extends State<SignUp> {
                               borderRadius: BorderRadius.circular(16),
                               boxShadow: [
                                 BoxShadow(
-                                  color: AppColors.primary.withOpacity(0.4),
+                                  color: AppColors.primary.withValues(alpha: 0.4),
                                   blurRadius: 15,
                                   offset: const Offset(0, 8),
                                 ),
@@ -325,13 +345,15 @@ class _SignUpState extends State<SignUp> {
                                   strokeWidth: 3,
                                 ),
                               )
-                                  : const Text(
-                                "Sign Up",
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  letterSpacing: 0.5,
+                                  : TranslationBuilder(
+                                builder: (context) => Text(
+                                  "sign_up".tr,
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    letterSpacing: 0.5,
+                                  ),
                                 ),
                               ),
                             ),
@@ -342,36 +364,44 @@ class _SignUpState extends State<SignUp> {
                   ),
                   const SizedBox(height: 30),
                   // Sign In Link
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        "Already have an account? ",
-                        style: TextStyle(
-                          color: AppColors.secondary.withOpacity(0.7),
-                          fontSize: 15,
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.pop(context);
-                        },
-                        child: ShaderMask(
-                          shaderCallback: (bounds) => LinearGradient(
-                            colors: [AppColors.primary, AppColors.darkOrange],
-                          ).createShader(bounds),
-                          child: const Text(
-                            "Sign In",
+                  TranslationBuilder(
+                    builder: (context) => Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Flexible(
+                          child: Text(
+                            "${'already_have_account'.tr} ",
                             style: TextStyle(
-                              color: Colors.white,
+                              color: AppColors.secondary.withValues(alpha: 0.7),
                               fontSize: 15,
-                              fontWeight: FontWeight.bold,
-                              decoration: TextDecoration.underline,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.pop(context);
+                          },
+                          child: ShaderMask(
+                            shaderCallback: (bounds) => LinearGradient(
+                              colors: [AppColors.primary, AppColors.darkOrange],
+                            ).createShader(bounds),
+                            child: Text(
+                              "sign_in".tr,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold,
+                                decoration: TextDecoration.underline,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.visible,
                             ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -391,46 +421,52 @@ class _SignUpState extends State<SignUp> {
     List<TextInputFormatter>? inputFormatters,
     String? Function(String?)? validator,
   }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.background.withOpacity(0.3),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: AppColors.accent.withOpacity(0.3),
-          width: 1.5,
-        ),
+    return TextFormField(
+      controller: controller,
+      obscureText: obscure,
+      keyboardType: keyboardType,
+      inputFormatters: inputFormatters,
+      validator: validator,
+      style: TextStyle(
+        color: AppColors.secondary,
+        fontSize: 16,
+        fontWeight: FontWeight.w500,
       ),
-      child: TextFormField(
-        controller: controller,
-        obscureText: obscure,
-        keyboardType: keyboardType,
-        inputFormatters: inputFormatters,
-        validator: validator,
-        style: TextStyle(
-          color: AppColors.secondary,
-          fontSize: 16,
+      decoration: InputDecoration(
+        filled: true,
+        fillColor: AppColors.background.withValues(alpha: 0.3),
+        prefixIcon: Icon(icon, color: AppColors.primary, size: 24),
+        labelText: label,
+        labelStyle: TextStyle(
+          color: AppColors.secondary.withValues(alpha: 0.6),
           fontWeight: FontWeight.w500,
         ),
-        decoration: InputDecoration(
-          filled: true,
-          fillColor: Colors.transparent,
-          prefixIcon: Icon(icon, color: AppColors.primary, size: 24),
-          labelText: label,
-          labelStyle: TextStyle(
-            color: AppColors.secondary.withOpacity(0.6),
-            fontWeight: FontWeight.w500,
-          ),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(14),
-            borderSide: BorderSide.none,
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(14),
-            borderSide: BorderSide(color: AppColors.primary, width: 2),
-          ),
-          contentPadding:
-          const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        floatingLabelStyle: TextStyle(
+          color: AppColors.primary,
+          fontWeight: FontWeight.w600,
+          backgroundColor: AppColors.background.withValues(alpha: 0.3),
         ),
+        floatingLabelBehavior: FloatingLabelBehavior.auto,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: BorderSide(
+            color: AppColors.accent.withValues(alpha: 0.3),
+            width: 1.5,
+          ),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: BorderSide(
+            color: AppColors.accent.withValues(alpha: 0.3),
+            width: 1.5,
+          ),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: BorderSide(color: AppColors.primary, width: 2),
+        ),
+        contentPadding:
+        const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       ),
     );
   }

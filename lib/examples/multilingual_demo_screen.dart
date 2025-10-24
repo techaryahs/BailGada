@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../utils/translation_helper.dart';
 import '../widgets/navigation_buttons.dart';
-import '../widgets/language_selector.dart';
+import '../widgets/modern_language_selector.dart';
 
 /// Demo screen showing how to properly implement multilingual support
 /// This demonstrates the navigation buttons from the screenshots with proper translation
@@ -24,7 +24,7 @@ class _MultilingualDemoScreenState extends State<MultilingualDemoScreen> {
           title: Text('multilingual_demo'.tr),
           backgroundColor: Colors.orange,
           actions: const [
-            LanguageSelector(),
+            ModernLanguageSelector(showAsBottomSheet: true),
             SizedBox(width: 16),
           ],
         ),
@@ -101,7 +101,7 @@ class _MultilingualDemoScreenState extends State<MultilingualDemoScreen> {
         decoration: BoxDecoration(
           color: Colors.grey[900],
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.orange.withOpacity(0.3)),
+          border: Border.all(color: Colors.orange.withValues(alpha: 0.3)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

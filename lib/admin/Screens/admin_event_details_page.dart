@@ -45,18 +45,18 @@ class AdminEventDetailsPage extends StatelessWidget {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      Colors.deepOrange.withOpacity(0.25),
-                      Colors.orange.withOpacity(0.1),
+                      Colors.deepOrange.withValues(alpha: 0.25),
+                      Colors.orange.withValues(alpha: 0.1),
                       Colors.transparent,
                     ],
                     begin: Alignment.centerLeft,
                     end: Alignment.centerRight,
                   ),
                   borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: Colors.orangeAccent.withOpacity(0.5), width: 1),
+                  border: Border.all(color: Colors.orangeAccent.withValues(alpha: 0.5), width: 1),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.orangeAccent.withOpacity(0.3),
+                      color: Colors.orangeAccent.withValues(alpha: 0.3),
                       blurRadius: 8,
                       offset: const Offset(0, 3),
                     ),
@@ -236,7 +236,7 @@ class AdminEventDetailsPage extends StatelessWidget {
                           borderRadius: BorderRadius.circular(12),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.greenAccent.withOpacity(0.4),
+                              color: Colors.greenAccent.withValues(alpha: 0.4),
                               blurRadius: 10,
                               offset: const Offset(0, 4),
                             ),
@@ -281,7 +281,7 @@ class AdminEventDetailsPage extends StatelessWidget {
                           borderRadius: BorderRadius.circular(12),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.redAccent.withOpacity(0.4),
+                              color: Colors.redAccent.withValues(alpha: 0.4),
                               blurRadius: 10,
                               offset: const Offset(0, 4),
                             ),
@@ -320,12 +320,12 @@ class AdminEventDetailsPage extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.7),
+        color: Colors.black.withValues(alpha: 0.7),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.orange.withOpacity(0.4)),
+        border: Border.all(color: Colors.orange.withValues(alpha: 0.4)),
         boxShadow: [
           BoxShadow(
-            color: Colors.orange.withOpacity(0.15),
+            color: Colors.orange.withValues(alpha: 0.15),
             blurRadius: 6,
             offset: const Offset(0, 3),
           ),

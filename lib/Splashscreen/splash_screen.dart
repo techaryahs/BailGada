@@ -1,11 +1,15 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../Screens/homeScreen.dart';
+import '../Screens/home_screen.dart';
 import '../auth/signin.dart';
+import '../host/Screens/dashboard_page.dart';
+import '../services/translation_service.dart';
+import '../widgets/live_translated_text.dart';
 
 class SplashScreen extends StatefulWidget {
-  const SplashScreen({super.key});
+  final String userKey;
+  const SplashScreen({super.key, required this.userKey});
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
@@ -15,10 +19,14 @@ class _SplashScreenState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _fadeAnimation;
+  final TranslationService _translationService = TranslationService();
 
   @override
   void initState() {
     super.initState();
+
+    // Initialize translation service
+    _initializeTranslations();
 
     // 🎞️ Animation setup
     _controller = AnimationController(
@@ -33,24 +41,43 @@ class _SplashScreenState extends State<SplashScreen>
     Timer(const Duration(seconds: 3), _checkLoginStatus);
   }
 
+  Future<void> _initializeTranslations() async {
+    await _translationService.initialize();
+    await _translationService.loadLanguagePreference();
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
   Future<void> _checkLoginStatus() async {
     final prefs = await SharedPreferences.getInstance();
     bool isLoggedIn = prefs.getBool("isLoggedIn") ?? false;
     String userKey = prefs.getString("userKey") ?? "";
+    bool isHost = prefs.getBool("isHost") ?? false;
 
-    print("🔍 Splash Debug: isLoggedIn=$isLoggedIn, userKey=$userKey");
+    // Debug: isLoggedIn=$isLoggedIn, userKey=$userKey, isHost=$isHost
 
     if (!mounted) return;
 
     if (isLoggedIn && userKey.isNotEmpty) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => HomeScreen(userKey: userKey)),
-      );
+      // Check if user is host
+      if (isHost) {
+        // Navigate to Host Dashboard
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => DashboardPage(userKey: widget.userKey,)),
+        );
+      } else {
+        // Navigate to regular Home Screen
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => HomeScreen(userKey: userKey)),
+        );
+      }
     } else {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => const SignIn()),
+        MaterialPageRoute(builder: (_) => SignIn(userKey:  widget.userKey,)),
       );
     }
   }
@@ -86,8 +113,8 @@ class _SplashScreenState extends State<SplashScreen>
                   size: 100, color: Colors.orangeAccent),
               const SizedBox(height: 20),
 
-              const Text(
-                "BailGada Race",
+              const LiveTranslatedText(
+                "bailgada_race",
                 style: TextStyle(
                   fontSize: 32,
                   fontWeight: FontWeight.bold,
@@ -97,8 +124,8 @@ class _SplashScreenState extends State<SplashScreen>
               ),
               const SizedBox(height: 10),
 
-              const Text(
-                "Ride the Speed, Rule the Track",
+              const LiveTranslatedText(
+                "ride_the_speed",
                 style: TextStyle(
                   fontSize: 16,
                   color: Colors.white70,

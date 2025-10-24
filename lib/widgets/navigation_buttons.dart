@@ -22,7 +22,7 @@ class NavigationButtons extends StatelessWidget {
               child: _buildNavButton(
                 context,
                 icon: Icons.home,
-                text: 'current_event'.tr,
+                text: 'current_event_nav'.tr,
                 onTap: () => onButtonPressed?.call('current'),
               ),
             ),
@@ -63,10 +63,10 @@ class NavigationButtons extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
-          color: isActive ? Colors.green.withOpacity(0.2) : Colors.black.withOpacity(0.8),
+          color: isActive ? Colors.green.withValues(alpha: 0.2) : Colors.black.withValues(alpha: 0.8),
           borderRadius: BorderRadius.circular(25),
           border: Border.all(
-            color: isActive ? Colors.green : Colors.white.withOpacity(0.3),
+            color: isActive ? Colors.green : Colors.white.withValues(alpha: 0.3),
             width: 1,
           ),
         ),

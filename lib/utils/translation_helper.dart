@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/translation_service.dart';
+import '../widgets/live_translated_text.dart';
+import '../widgets/smart_text.dart';
 
 class Tr {
   static String get(String key) => TranslationService().translate(key);
@@ -11,6 +13,11 @@ extension StringTranslationExt on String {
   String get tr => Tr.get(this);
   
   Future<String> get trAsync => Tr.getAsync(this);
+  
+  Widget get trLive => LiveTranslatedText(this);
+  
+  // Smart translation - auto-detects if it's a key or English text
+  Widget get trSmart => SmartText(this);
 }
 
 class TranslationBuilder extends StatefulWidget {

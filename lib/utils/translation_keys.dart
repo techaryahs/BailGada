@@ -117,7 +117,7 @@ class TranslationKeys {
   static const String unknownDate = 'unknown_date';
   
   // Navigation Buttons (Marathi specific)
-  static const String currentEvent = 'current_event';
+  static const String currentEventNav = 'current_event_nav';
   static const String upcomingProgram = 'upcoming_program';
   static const String pastTime = 'past_time';
   
@@ -140,4 +140,53 @@ class TranslationKeys {
   static const String vikramJadhavMr = 'vikram_jadhav_mr';
   static const String nitinGaikwadMr = 'nitin_gaikwad_mr';
   static const String rajeshShindeMr = 'rajesh_shinde_mr';
+  
+  // My Bail OX Screen
+  static const String myBailOx = 'my_bail_ox';
+  static const String noOxAddedYet = 'no_ox_added_yet';
+  static const String unnamedOx = 'unnamed_ox';
+  static const String single = 'single';
+  static const String pair = 'pair';
+  static const String addOx = 'add_ox';
+  static const String oxDetails = 'ox_details';
+  static const String oxPairDetails = 'ox_pair_details';
+  static const String oxName = 'ox_name';
+  static const String firstOxName = 'first_ox_name';
+  static const String secondOxName = 'second_ox_name';
+  static const String oxPhoto = 'ox_photo';
+  static const String firstOxPhoto = 'first_ox_photo';
+  static const String secondOxPhoto = 'second_ox_photo';
+  static const String selectType = 'select_type';
+  static const String saveOx = 'save_ox';
+  static const String enterOxName = 'enter_ox_name';
+  static const String enterFirstOxName = 'enter_first_ox_name';
+  static const String enterSecondOxName = 'enter_second_ox_name';
+  static const String pleaseAddOxPhoto = 'please_add_ox_photo';
+  static const String pleaseAddBothOxPhotos = 'please_add_both_ox_photos';
+  static const String tapToAdd = 'tap_to_add';
+  
+  // Event Host Page
+  static const String bailgadaRaceChampionship = 'bailgada_race_championship';
+  static const String liveFromLocation = 'live_from_location';
+  static const String rounds = 'rounds';
+  static const String all = 'all';
+  static const String raceSlots = 'race_slots';
+  static const String slotsYetToBeDeclared = 'slots_yet_to_be_declared';
+  static const String stayTunedNextRound = 'stay_tuned_next_round';
+  static const String participants = 'participants';
+  static const String noParticipantsAvailable = 'no_participants_available';
+  static const String track = 'track';
+  
+  // Racer Details
+  static const String racer = 'racer';
+  static const String bull = 'bull';
+  static const String village = 'village';
+  static const String experience = 'experience';
+  static const String previousWins = 'previous_wins';
+  static const String races = 'races';
+  
+  // Modern Language Selector
+  static const String modernLanguageSelector = 'modern_language_selector';
+  static const String languageChanged = 'language_changed';
+  static const String selectYourLanguage = 'select_your_language';
 }

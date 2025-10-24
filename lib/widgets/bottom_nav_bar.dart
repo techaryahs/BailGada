@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
+import '../utils/translation_helper.dart';
 
 class CustomBottomNavBar extends StatelessWidget {
   final int currentIndex;
   final Function(int) onTap;
 
   const CustomBottomNavBar({
-    Key? key,
+    super.key,
     required this.currentIndex,
     required this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -19,10 +20,10 @@ class CustomBottomNavBar extends StatelessWidget {
       selectedItemColor: const Color(0xFFFF9800),
       unselectedItemColor: Colors.grey,
       backgroundColor: Colors.white,
-      items: const [
-        BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-        BottomNavigationBarItem(icon: Icon(Icons.event), label: 'Events'),
-        BottomNavigationBarItem(icon: Icon(Icons.payment), label: 'Payments'),
+      items: [
+        BottomNavigationBarItem(icon: const Icon(Icons.home), label: 'home'.tr),
+        BottomNavigationBarItem(icon: const Icon(Icons.event), label: 'events'.tr),
+        BottomNavigationBarItem(icon: const Icon(Icons.payment), label: 'payments'.tr),
         // BottomNavigationBarItem(icon: Icon(Icons.approval), label: 'Approvals'),
         // BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Settings'),
       ],

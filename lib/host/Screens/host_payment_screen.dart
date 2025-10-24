@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class HostPaymentScreen extends StatelessWidget {
-  const HostPaymentScreen({Key? key}) : super(key: key);
+  const HostPaymentScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +48,7 @@ class HostPaymentScreen extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF6B8E23).withOpacity(0.1),
+                          color: const Color(0xFF6B8E23).withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: const Icon(

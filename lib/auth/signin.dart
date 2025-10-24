@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'dart:convert';
-import 'dart:ui';
 import 'package:crypto/crypto.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../Screens/homeScreen.dart';
+import '../Screens/home_screen.dart';
+import '../utils/translation_helper.dart';
+import '../host/Screens/dashboard_page.dart';
 import 'signup.dart';
 
 // Fresh Vibrant Orange and White theme colors
@@ -19,7 +19,8 @@ class AppColors {
 }
 
 class SignIn extends StatefulWidget {
-  const SignIn({super.key});
+  final String userKey;
+  const SignIn({super.key, required this.userKey});
 
   @override
   State<SignIn> createState() => _SignInState();
@@ -49,10 +50,46 @@ class _SignInState extends State<SignIn> {
     String email = _emailController.text.trim();
     String password = _passwordController.text.trim();
 
-    var bytes = utf8.encode(password);
-    var hashedPassword = sha256.convert(bytes).toString();
+    // Predefined host credentials
+    const String hostEmail = 'Host@gmail.com';
+    const String hostPassword = 'host_123';
 
     try {
+      // Check if it's the host login first
+      if (email.toLowerCase() == hostEmail.toLowerCase() && password == hostPassword) {
+        // Create/update host entry in database
+        final DatabaseReference dbRef = FirebaseDatabase.instance.ref("bailGada");
+        final String hostKey = "host_admin";
+        
+        // Store host data in database
+        await dbRef.child("users/$hostKey").set({
+          "name": "Host Admin",
+          "email": hostEmail,
+          "phone": "N/A",
+          "password": sha256.convert(utf8.encode(hostPassword)).toString(),
+        });
+        
+        // Host login successful
+        await prefs.setBool("isLoggedIn", true);
+        await prefs.setString("userKey", hostKey);
+        await prefs.setString("userEmail", email);
+        await prefs.setBool("isHost", true);
+
+        if (mounted) {
+          // Navigate directly to Host Dashboard
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (context) => DashboardPage(userKey: widget.userKey,)),
+          );
+        }
+        return;
+      }
+
+      // If not host, check regular users in database
+      var bytes = utf8.encode(password);
+      var hashedPassword = sha256.convert(bytes).toString();
+
       final DatabaseReference dbRef = FirebaseDatabase.instance.ref("bailGada");
       DatabaseEvent event = await dbRef.child("users").once();
       Map<dynamic, dynamic>? users = event.snapshot.value as Map?;
@@ -65,6 +102,8 @@ class _SignInState extends State<SignIn> {
             userFound = true;
             await prefs.setBool("isLoggedIn", userFound);
             await prefs.setString("userKey", userKey);
+            await prefs.setString("userEmail", email);
+            await prefs.setBool("isHost", false);
 
             if (mounted) {
               Navigator.pushReplacement(
@@ -77,14 +116,14 @@ class _SignInState extends State<SignIn> {
         });
 
         if (!userFound && mounted) {
-          _showMessage("Invalid email or password");
+          _showMessage("invalid_credentials".tr);
         }
       } else {
-        _showMessage("No users found in database");
+        _showMessage("no_data".tr);
       }
 
     } catch (e) {
-      _showMessage("Error: $e");
+      _showMessage("${'error'.tr}: $e");
     } finally {
       if (mounted) {
         setState(() => isLoading = false);
@@ -118,7 +157,7 @@ class _SignInState extends State<SignIn> {
             colors: [
               Colors.white,
               AppColors.background,
-              AppColors.accent.withOpacity(0.3),
+              AppColors.accent.withValues(alpha: 0.3),
             ],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
@@ -144,7 +183,7 @@ class _SignInState extends State<SignIn> {
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: AppColors.primary.withOpacity(0.5),
+                          color: AppColors.primary.withValues(alpha: 0.5),
                           blurRadius: 20,
                           offset: const Offset(0, 10),
                         ),
@@ -162,9 +201,9 @@ class _SignInState extends State<SignIn> {
                     shaderCallback: (bounds) => LinearGradient(
                       colors: [AppColors.primary, AppColors.darkOrange],
                     ).createShader(bounds),
-                    child: const Text(
-                      "BailGada Race",
-                      style: TextStyle(
+                    child: Text(
+                      "bailgada_race".tr,
+                      style: const TextStyle(
                         fontSize: 36,
                         fontWeight: FontWeight.w900,
                         color: Colors.white,
@@ -174,10 +213,10 @@ class _SignInState extends State<SignIn> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    "Sign in to continue",
+                    "sign_in_to_continue".tr,
                     style: TextStyle(
                       fontSize: 16,
-                      color: AppColors.secondary.withOpacity(0.7),
+                      color: AppColors.secondary.withValues(alpha: 0.7),
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -190,7 +229,7 @@ class _SignInState extends State<SignIn> {
                       borderRadius: BorderRadius.circular(24),
                       boxShadow: [
                         BoxShadow(
-                          color: AppColors.primary.withOpacity(0.15),
+                          color: AppColors.primary.withValues(alpha: 0.15),
                           blurRadius: 30,
                           offset: const Offset(0, 10),
                         ),
@@ -202,12 +241,12 @@ class _SignInState extends State<SignIn> {
                         children: [
                           _buildTextField(
                             controller: _emailController,
-                            label: "Email Address",
+                            label: "email_address".tr,
                             icon: Icons.email_rounded,
                             keyboardType: TextInputType.emailAddress,
                             validator: (value) {
                               if (value == null || value.trim().isEmpty) {
-                                return 'Please enter your email';
+                                return 'please_enter_email'.tr;
                               }
                               return null;
                             },
@@ -215,15 +254,15 @@ class _SignInState extends State<SignIn> {
                           const SizedBox(height: 20),
                           _buildTextField(
                             controller: _passwordController,
-                            label: "Password",
+                            label: "password".tr,
                             icon: Icons.lock_rounded,
                             obscure: true,
                             validator: (value) {
                               if (value == null || value.trim().isEmpty) {
-                                return 'Please enter your password';
+                                return 'please_enter_password'.tr;
                               }
                               if (value.length < 6) {
-                                return 'Password must be at least 6 characters';
+                                return 'password_min_6'.tr;
                               }
                               return null;
                             },
@@ -240,11 +279,16 @@ class _SignInState extends State<SignIn> {
                                   borderRadius: BorderRadius.circular(4),
                                 ),
                               ),
-                              Text(
-                                'Remember Me',
-                                style: TextStyle(
-                                  color: AppColors.secondary,
-                                  fontWeight: FontWeight.w500,
+                              Expanded(
+                                child: Text(
+                                  'remember_me'.tr,
+                                  style: TextStyle(
+                                    color: AppColors.secondary,
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 14,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ),
                             ],
@@ -261,7 +305,7 @@ class _SignInState extends State<SignIn> {
                               borderRadius: BorderRadius.circular(16),
                               boxShadow: [
                                 BoxShadow(
-                                  color: AppColors.primary.withOpacity(0.4),
+                                  color: AppColors.primary.withValues(alpha: 0.4),
                                   blurRadius: 15,
                                   offset: const Offset(0, 8),
                                 ),
@@ -285,9 +329,9 @@ class _SignInState extends State<SignIn> {
                                   strokeWidth: 3,
                                 ),
                               )
-                                  : const Text(
-                                "Sign In",
-                                style: TextStyle(
+                                  : Text(
+                                "sign_in".tr,
+                                style: const TextStyle(
                                   fontSize: 18,
                                   color: Colors.white,
                                   fontWeight: FontWeight.bold,
@@ -305,11 +349,15 @@ class _SignInState extends State<SignIn> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(
-                        "Don't have an account? ",
-                        style: TextStyle(
-                          color: AppColors.secondary.withOpacity(0.7),
-                          fontSize: 15,
+                      Flexible(
+                        child: Text(
+                          "${'dont_have_account'.tr} ",
+                          style: TextStyle(
+                            color: AppColors.secondary.withValues(alpha: 0.7),
+                            fontSize: 15,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                       GestureDetector(
@@ -317,21 +365,23 @@ class _SignInState extends State<SignIn> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => const SignUp()),
+                                builder: (context) => SignUp(userKey:  widget.userKey,)),
                           );
                         },
                         child: ShaderMask(
                           shaderCallback: (bounds) => LinearGradient(
                             colors: [AppColors.primary, AppColors.darkOrange],
                           ).createShader(bounds),
-                          child: const Text(
-                            "Sign Up",
-                            style: TextStyle(
+                          child: Text(
+                            "sign_up".tr,
+                            style: const TextStyle(
                               color: Colors.white,
                               fontSize: 15,
                               fontWeight: FontWeight.bold,
                               decoration: TextDecoration.underline,
                             ),
+                            maxLines: 1,
+                            overflow: TextOverflow.visible,
                           ),
                         ),
                       ),
@@ -354,45 +404,51 @@ class _SignInState extends State<SignIn> {
     TextInputType keyboardType = TextInputType.text,
     String? Function(String?)? validator,
   }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.background.withOpacity(0.3),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: AppColors.accent.withOpacity(0.3),
-          width: 1.5,
-        ),
+    return TextFormField(
+      controller: controller,
+      obscureText: obscure,
+      keyboardType: keyboardType,
+      validator: validator,
+      style: TextStyle(
+        color: AppColors.secondary,
+        fontSize: 16,
+        fontWeight: FontWeight.w500,
       ),
-      child: TextFormField(
-        controller: controller,
-        obscureText: obscure,
-        keyboardType: keyboardType,
-        validator: validator,
-        style: TextStyle(
-          color: AppColors.secondary,
-          fontSize: 16,
+      decoration: InputDecoration(
+        filled: true,
+        fillColor: AppColors.background.withValues(alpha: 0.3),
+        prefixIcon: Icon(icon, color: AppColors.primary, size: 24),
+        labelText: label,
+        labelStyle: TextStyle(
+          color: AppColors.secondary.withValues(alpha: 0.6),
           fontWeight: FontWeight.w500,
         ),
-        decoration: InputDecoration(
-          filled: true,
-          fillColor: Colors.transparent,
-          prefixIcon: Icon(icon, color: AppColors.primary, size: 24),
-          labelText: label,
-          labelStyle: TextStyle(
-            color: AppColors.secondary.withOpacity(0.6),
-            fontWeight: FontWeight.w500,
-          ),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(14),
-            borderSide: BorderSide.none,
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(14),
-            borderSide: BorderSide(color: AppColors.primary, width: 2),
-          ),
-          contentPadding:
-          const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        floatingLabelStyle: TextStyle(
+          color: AppColors.primary,
+          fontWeight: FontWeight.w600,
+          backgroundColor: AppColors.background.withValues(alpha: 0.3),
         ),
+        floatingLabelBehavior: FloatingLabelBehavior.auto,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: BorderSide(
+            color: AppColors.accent.withValues(alpha: 0.3),
+            width: 1.5,
+          ),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: BorderSide(
+            color: AppColors.accent.withValues(alpha: 0.3),
+            width: 1.5,
+          ),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: BorderSide(color: AppColors.primary, width: 2),
+        ),
+        contentPadding:
+        const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       ),
     );
   }
