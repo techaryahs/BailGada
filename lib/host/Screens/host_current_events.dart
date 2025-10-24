@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:bailgada/host/Screens/event_host_page.dart';
+import 'package:bailgada/host/Screens/host_dashboard.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import '../../widgets/dynamic_translated_text.dart';
@@ -117,7 +118,7 @@ class _HostCurrentEventsPageState extends State<HostCurrentEventsPage> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => EventHostPage(),
+            builder: (context) => HostDashboard(),
           ),
         );
       },

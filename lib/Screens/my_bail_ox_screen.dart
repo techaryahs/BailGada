@@ -15,9 +15,9 @@ class _MyBailOxPageState extends State<MyBailOxPage> {
   // --- Default demo data (no external asset required) ---
   // image: null means show placeholder icon; added types for clarity
   final List<Map<String, String?>> oxList = [
-    {"name": "Ganesh", "image": null, "type": "Single"},
-    {"name": "Bheem & Bala", "image": null, "type": "Pair"},
-    {"name": "Raja", "image": null, "type": "Single"},
+    {"name": "Ganesh", "image": null, "type": "Single", "bail_type": "Adat bail"},
+    {"name": "Bheem & Bala", "image": null, "type": "Pair", "bail_type": "Dusa bail"},
+    {"name": "Raja", "image": null, "type": "Single", "bail_type": "Chosa bail"},
   ];
 
   @override
@@ -115,11 +115,24 @@ class _MyBailOxPageState extends State<MyBailOxPage> {
                           Expanded(
                             child: Text(
                               "ID: ${1000 + index}", // placeholder id
-                              style: const TextStyle(color: Colors.white70),
+                              style: const TextStyle(color: Colors.white70, fontSize: 12),
                             ),
                           ),
                         ],
                       ),
+                      if (ox["bail_type"] != null) ...[
+                        const SizedBox(height: 6),
+                        Row(
+                          children: [
+                            const Icon(Icons.category, size: 14, color: Colors.orangeAccent),
+                            const SizedBox(width: 6),
+                            Text(
+                              ox["bail_type"]!,
+                              style: const TextStyle(color: Colors.white70, fontSize: 12),
+                            ),
+                          ],
+                        ),
+                      ],
                     ],
                   ),
                 ),
@@ -198,6 +211,9 @@ class _MyBailOxPageState extends State<MyBailOxPage> {
               "name": newOx["name"],
               "image": newOx["image"],
               "type": newOx["type"] ?? "Single",
+              "bail_type": newOx["bail_type"],
+              "bail_details": newOx["bail_details"],
+              "bail_achievements": newOx["bail_achievements"],
             });
           });
         }
@@ -245,11 +261,23 @@ class _AddOxFormPageState extends State<AddOxFormPage> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _ox1NameCtrl = TextEditingController();
   final TextEditingController _ox2NameCtrl = TextEditingController();
+  final TextEditingController _bailDetailsCtrl = TextEditingController();
+  final TextEditingController _bailAchievementsCtrl = TextEditingController();
   final ImagePicker _picker = ImagePicker();
 
   String _selectedType = "Single";
+  String _selectedBailType = "Adat bail";
   File? _ox1Image;
   File? _ox2Image;
+
+  @override
+  void dispose() {
+    _ox1NameCtrl.dispose();
+    _ox2NameCtrl.dispose();
+    _bailDetailsCtrl.dispose();
+    _bailAchievementsCtrl.dispose();
+    super.dispose();
+  }
 
   Future<void> _pickImage(bool isFirst) async {
     final picked = await _picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
@@ -279,10 +307,13 @@ class _AddOxFormPageState extends State<AddOxFormPage> {
 
     final result = {
       "type": _selectedType,
+      "bail_type": _selectedBailType,
       "ox1_name": _ox1NameCtrl.text.trim(),
       "ox1_image": _ox1Image?.path,
       "ox2_name": _selectedType == "Pair" ? _ox2NameCtrl.text.trim() : null,
       "ox2_image": _selectedType == "Pair" ? _ox2Image?.path : null,
+      "bail_details": _bailDetailsCtrl.text.trim().isNotEmpty ? _bailDetailsCtrl.text.trim() : null,
+      "bail_achievements": _bailAchievementsCtrl.text.trim().isNotEmpty ? _bailAchievementsCtrl.text.trim() : null,
     };
 
     Navigator.pop(context, result);
@@ -317,26 +348,97 @@ class _AddOxFormPageState extends State<AddOxFormPage> {
           key: _formKey,
           child: ListView(
             children: [
-              // 🔸 Type Dropdown
-              DropdownButtonFormField<String>(
-                initialValue: _selectedType,
-                dropdownColor: Colors.black,
-                style: const TextStyle(color: Colors.white, fontSize: 16),
-                icon: const Icon(Icons.arrow_drop_down, color: Colors.orangeAccent),
-                items: [
-                  DropdownMenuItem(value: "Single", child: TranslationBuilder(builder: (context) => Text('single'.tr, style: const TextStyle(color: Colors.white)))),
-                  DropdownMenuItem(value: "Pair", child: TranslationBuilder(builder: (context) => Text('pair'.tr, style: const TextStyle(color: Colors.white)))),
-                ],
-                onChanged: (v) => setState(() => _selectedType = v ?? "Single"),
-                decoration: InputDecoration(
-                  labelText: 'select_type'.tr,
-                  labelStyle: const TextStyle(color: Colors.orangeAccent),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.orangeAccent.withValues(alpha: 0.5)),
-                  ),
-                  focusedBorder: const OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.orangeAccent),
-                  ),
+              // 🔸 Type Dropdown (Single/Pair)
+              TranslationBuilder(
+                builder: (context) => Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'select_type'.tr,
+                      style: const TextStyle(
+                        color: Colors.orangeAccent,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    DropdownButtonFormField<String>(
+                      value: _selectedType,
+                      dropdownColor: Colors.black,
+                      style: const TextStyle(color: Colors.white, fontSize: 16),
+                      icon: const Icon(Icons.arrow_drop_down, color: Colors.orangeAccent),
+                      decoration: InputDecoration(
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.orangeAccent.withValues(alpha: 0.5)),
+                        ),
+                        focusedBorder: const OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.orangeAccent),
+                        ),
+                      ),
+                      items: [
+                        DropdownMenuItem(
+                          value: "Single",
+                          child: Text('single'.tr, style: const TextStyle(color: Colors.white)),
+                        ),
+                        DropdownMenuItem(
+                          value: "Pair",
+                          child: Text('pair'.tr, style: const TextStyle(color: Colors.white)),
+                        ),
+                      ],
+                      onChanged: (v) => setState(() => _selectedType = v ?? "Single"),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              // 🔸 Bail Type Dropdown
+              TranslationBuilder(
+                builder: (context) => Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'bail_type'.tr,
+                      style: const TextStyle(
+                        color: Colors.orangeAccent,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    DropdownButtonFormField<String>(
+                      value: _selectedBailType,
+                      dropdownColor: Colors.black,
+                      style: const TextStyle(color: Colors.white, fontSize: 16),
+                      icon: const Icon(Icons.arrow_drop_down, color: Colors.orangeAccent),
+                      decoration: InputDecoration(
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.orangeAccent.withValues(alpha: 0.5)),
+                        ),
+                        focusedBorder: const OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.orangeAccent),
+                        ),
+                      ),
+                      items: [
+                        DropdownMenuItem(
+                          value: "Adat bail",
+                          child: Text('adat_bail'.tr, style: const TextStyle(color: Colors.white)),
+                        ),
+                        DropdownMenuItem(
+                          value: "Dusa bail",
+                          child: Text('dusa_bail'.tr, style: const TextStyle(color: Colors.white)),
+                        ),
+                        DropdownMenuItem(
+                          value: "Chosa bail",
+                          child: Text('chosa_bail'.tr, style: const TextStyle(color: Colors.white)),
+                        ),
+                      ],
+                      onChanged: (v) => setState(() => _selectedBailType = v ?? "Adat bail"),
+                    ),
+                  ],
                 ),
               ),
 
@@ -349,6 +451,78 @@ class _AddOxFormPageState extends State<AddOxFormPage> {
               // 🐂 Fields for Pair OX
               if (_selectedType == "Pair")
                 _buildPairOxSection(),
+
+              const SizedBox(height: 20),
+
+              // 📝 Bail Details (Optional)
+              TranslationBuilder(
+                builder: (context) => Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'bail_details'.tr,
+                      style: const TextStyle(
+                        color: Colors.orangeAccent,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    TextFormField(
+                      controller: _bailDetailsCtrl,
+                      style: const TextStyle(color: Colors.white),
+                      maxLines: 3,
+                      decoration: InputDecoration(
+                        hintText: 'bail_details_hint'.tr,
+                        hintStyle: const TextStyle(color: Colors.white30),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.orangeAccent.withValues(alpha: 0.5)),
+                        ),
+                        focusedBorder: const OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.orangeAccent),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              // 🏆 Bail Achievements (Optional)
+              TranslationBuilder(
+                builder: (context) => Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'bail_achievements'.tr,
+                      style: const TextStyle(
+                        color: Colors.orangeAccent,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    TextFormField(
+                      controller: _bailAchievementsCtrl,
+                      style: const TextStyle(color: Colors.white),
+                      maxLines: 3,
+                      decoration: InputDecoration(
+                        hintText: 'bail_achievements_hint'.tr,
+                        hintStyle: const TextStyle(color: Colors.white30),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.orangeAccent.withValues(alpha: 0.5)),
+                        ),
+                        focusedBorder: const OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.orangeAccent),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
 
               const SizedBox(height: 30),
 

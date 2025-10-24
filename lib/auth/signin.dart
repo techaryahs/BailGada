@@ -50,76 +50,57 @@ class _SignInState extends State<SignIn> {
     String email = _emailController.text.trim();
     String password = _passwordController.text.trim();
 
-    // Predefined host credentials
-    const String hostEmail = 'Host@gmail.com';
-    const String hostPassword = 'host_123';
-
     try {
-      // Check if it's the host login first
-      if (email.toLowerCase() == hostEmail.toLowerCase() && password == hostPassword) {
-        // Create/update host entry in database
-        final DatabaseReference dbRef = FirebaseDatabase.instance.ref("bailGada");
-        final String hostKey = "host_admin";
-        
-        // Store host data in database
-        await dbRef.child("users/$hostKey").set({
-          "name": "Host Admin",
-          "email": hostEmail,
-          "phone": "N/A",
-          "password": sha256.convert(utf8.encode(hostPassword)).toString(),
-        });
-        
-        // Host login successful
-        await prefs.setBool("isLoggedIn", true);
-        await prefs.setString("userKey", hostKey);
-        await prefs.setString("userEmail", email);
-        await prefs.setBool("isHost", true);
-
-        if (mounted) {
-          // Navigate directly to Host Dashboard
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-                builder: (context) => DashboardPage(userKey: widget.userKey,)),
-          );
-        }
-        return;
-      }
-
-      // If not host, check regular users in database
       var bytes = utf8.encode(password);
       var hashedPassword = sha256.convert(bytes).toString();
 
-      final DatabaseReference dbRef = FirebaseDatabase.instance.ref("bailGada");
-      DatabaseEvent event = await dbRef.child("users").once();
-      Map<dynamic, dynamic>? users = event.snapshot.value as Map?;
+      final DatabaseReference dbRef = FirebaseDatabase.instance.ref("bailGada/users");
+      DatabaseEvent event = await dbRef.once();
 
-      if (users != null) {
-        bool userFound = false;
-        users.forEach((key, value) async {
-          if (value["email"] == email && value["password"] == hashedPassword) {
-            String userKey = key;
-            userFound = true;
-            await prefs.setBool("isLoggedIn", userFound);
-            await prefs.setString("userKey", userKey);
-            await prefs.setString("userEmail", email);
-            await prefs.setBool("isHost", false);
-
-            if (mounted) {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => HomeScreen(userKey: userKey)),
-              );
-            }
-          }
-        });
-
-        if (!userFound && mounted) {
-          _showMessage("invalid_credentials".tr);
-        }
-      } else {
+      final data = event.snapshot.value;
+      if (data == null || data is! Map) {
         _showMessage("no_data".tr);
+        setState(() => isLoading = false);
+        return;
+      }
+
+      final Map<dynamic, dynamic> users = data;
+      bool userFound = false;
+
+      for (final entry in users.entries) {
+        final key = entry.key;
+        final value = entry.value;
+
+        if (value["email"] == email && value["password"] == hashedPassword) {
+          userFound = true;
+          String role = value["role"];
+          String userKey = key;
+
+          await prefs.setBool("isLoggedIn", true);
+          await prefs.setString("userKey", userKey);
+          await prefs.setString("userEmail", email);
+          await prefs.setBool("isHost", role == "host");
+
+          if (!mounted) return;
+
+          if (role == "host") {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => DashboardPage(userKey: userKey)),
+            );
+          } else {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => HomeScreen(userKey: userKey)),
+            );
+          }
+
+          return; // ✅ Stop execution after login
+        }
+      }
+
+      if (!userFound && mounted) {
+        _showMessage("invalid_credentials".tr);
       }
 
     } catch (e) {
@@ -130,6 +111,7 @@ class _SignInState extends State<SignIn> {
       }
     }
   }
+
 
   void _showMessage(String message) {
     ScaffoldMessenger.of(context).showSnackBar(

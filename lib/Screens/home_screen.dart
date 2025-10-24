@@ -4,8 +4,6 @@ import 'package:carousel_slider/carousel_slider.dart';
 import '../widgets/bottombar.dart';
 import '../widgets/event_category_bar.dart';
 import '../widgets/live_translated_text.dart';
-import '../widgets/dynamic_translated_text.dart';
-import '../utils/marathi_utils.dart';
 import 'events/current_events_page.dart';
 import 'events/past_event_page.dart';
 import 'events/upcoming_events_page.dart';
@@ -116,7 +114,7 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
                             end: Alignment.bottomCenter,
                             colors: [
                               Colors.transparent,
-                              Colors.black.withOpacity(0.7),
+                              Colors.black.withValues(alpha: 0.7),
                             ],
                           ),
                         ),
@@ -244,7 +242,7 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.orangeAccent.withOpacity(0.1),
+                          color: Colors.orangeAccent.withValues(alpha: 0.1),
                           blurRadius: 20,
                           offset: const Offset(0, 6),
                         ),
@@ -362,12 +360,12 @@ Widget _buildCrazyRacerCard(BuildContext context,
   return Container(
     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
     decoration: BoxDecoration(
-      color: Colors.black.withOpacity(0.6),
+      color: Colors.black.withValues(alpha: 0.6),
       borderRadius: BorderRadius.circular(16),
-      border: Border.all(color: color.withOpacity(0.6), width: 1.2),
+      border: Border.all(color: color.withValues(alpha: 0.6), width: 1.2),
       boxShadow: [
         BoxShadow(
-          color: color.withOpacity(0.3),
+          color: color.withValues(alpha: 0.3),
           blurRadius: 12,
           offset: const Offset(0, 5),
         ),
@@ -384,7 +382,7 @@ Widget _buildCrazyRacerCard(BuildContext context,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
-                  colors: [color.withOpacity(0.4), Colors.transparent],
+                  colors: [color.withValues(alpha: 0.4), Colors.transparent],
                 ),
               ),
             ),

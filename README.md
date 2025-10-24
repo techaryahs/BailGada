@@ -1,6 +1,6 @@
 # bailgada
 
-BailGada project.
+A new Flutter project.
 
 ## Getting Started
 

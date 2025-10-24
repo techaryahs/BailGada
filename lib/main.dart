@@ -12,7 +12,6 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  final String userKey;
   final translationService = TranslationService();
   await translationService.initialize();
   await translationService.loadLanguagePreference();

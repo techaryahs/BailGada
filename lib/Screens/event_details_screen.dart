@@ -44,7 +44,7 @@ class EventDetailsScreen extends StatelessWidget {
                           begin: Alignment.bottomCenter,
                           end: Alignment.topCenter,
                           colors: [
-                            Colors.black.withOpacity(0.8),
+                            Colors.black.withValues(alpha: 0.8),
                             Colors.transparent,
                           ],
                         ),
@@ -147,8 +147,8 @@ class EventDetailsScreen extends StatelessWidget {
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
-                        Colors.deepOrange.withOpacity(0.9),
-                        Colors.orangeAccent.withOpacity(0.7),
+                        Colors.deepOrange.withValues(alpha: 0.9),
+                        Colors.orangeAccent.withValues(alpha: 0.7),
                       ],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
@@ -156,7 +156,7 @@ class EventDetailsScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(14),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.orangeAccent.withOpacity(0.4),
+                        color: Colors.orangeAccent.withValues(alpha: 0.4),
                         blurRadius: 10,
                         offset: const Offset(0, 4),
                       ),

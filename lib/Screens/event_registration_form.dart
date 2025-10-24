@@ -242,7 +242,7 @@ class _EventRegistrationFormState extends State<EventRegistrationForm> {
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
             borderSide:
-            BorderSide(color: Colors.orangeAccent.withOpacity(0.6)),
+            BorderSide(color: Colors.orangeAccent.withValues(alpha: 0.6)),
           ),
         ),
       ),
