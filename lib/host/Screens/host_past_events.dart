@@ -35,7 +35,7 @@ class _HostPastEventsPageState extends State<HostPastEventsPage> {
 
         if (snapshot.hasError) {
           return const Center(
-            child: Text("Error loading past events",
+            child: LiveTranslatedText("error_loading_past_events",
                 style: TextStyle(color: Colors.redAccent)),
           );
         }
